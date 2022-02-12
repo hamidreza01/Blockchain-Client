@@ -1,4 +1,5 @@
 const Block = require('./Block');
+const cryptoHash = require('./hash-function');
 
 class BlockChain {
   constructor() {
@@ -11,5 +12,22 @@ class BlockChain {
     });
     this.chain.push(block);
   }
+  static isValid(chain) {
+    if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis()))
+      return false;
+    for (let i = 1; i < chain.length; i++) {
+      if (chain[i].lastHash !== chain[i - 1].hash) {
+        return false;
+      }
+      if (
+        chain[i].hash !==
+        cryptoHash(chain[i].timeStamp, chain[i].lastHash, chain[i].data)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+  r;
 }
 module.exports = BlockChain;
