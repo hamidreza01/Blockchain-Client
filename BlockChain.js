@@ -28,6 +28,17 @@ class BlockChain {
     }
     return true;
   }
-  r;
+  replaceChain(chain) {
+    if (chain.length <= this.chain.length) {
+      console.error('chain is short');
+      return;
+    }
+    if (!BlockChain.isValid(chain)) {
+      console.error('chain is not valid');
+      return;
+    }
+    this.chain = chain;
+    console.log('replace chain with : ', chain);
+  }
 }
 module.exports = BlockChain;
