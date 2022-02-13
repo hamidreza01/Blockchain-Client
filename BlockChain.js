@@ -5,6 +5,7 @@ class BlockChain {
   constructor() {
     this.chain = [Block.genesis()];
   }
+
   addBlock({ data }) {
     const block = Block.mainBlock({
       lastBlock: this.chain[this.chain.length - 1],
@@ -12,6 +13,7 @@ class BlockChain {
     });
     this.chain.push(block);
   }
+
   static isValid(chain) {
     if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis()))
       return false;
@@ -19,15 +21,25 @@ class BlockChain {
       if (chain[i].lastHash !== chain[i - 1].hash) {
         return false;
       }
+      if (Math.abs(chain[i - 1].defficulty - chain[i]) > 1) {
+        return false;
+      }
       if (
         chain[i].hash !==
-        cryptoHash(chain[i].timeStamp, chain[i].lastHash, chain[i].data)
+        cryptoHash(
+          chain[i].timeStamp,
+          chain[i].lastHash,
+          chain[i].data,
+          chain[i].defficulty,
+          chain[i].nonce
+        )
       ) {
         return false;
       }
     }
     return true;
   }
+
   replaceChain(chain) {
     if (chain.length <= this.chain.length) {
       console.error('chain is short');

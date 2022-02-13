@@ -62,6 +62,8 @@ describe('BlockChain', () => {
       blockChain = new BlockChain();
       newBlock = new BlockChain();
       oldBlock = blockChain.chain;
+      global.console.log = () => {};
+      global.console.error = () => {};
     });
     it('is shorter', () => {
       blockChain.replaceChain(newBlock.chain);
