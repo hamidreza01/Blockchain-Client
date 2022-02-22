@@ -1,5 +1,5 @@
-const MINE_RATE = 1000;
-const DIFFICULTY = 1;
+const MINE_RATE = 10000;
+const DIFFICULTY = 10;
 const GENESIS_DATA = {
   hash: 'DEXhash',
   lastHash: 'dexLastHash',

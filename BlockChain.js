@@ -15,25 +15,26 @@ class BlockChain {
   }
 
   static isValid(chain) {
-    if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis()))
+    if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis())){
+      console.log("err 1")
       return false;
-    for (let i = 1; i < chain.length; i++) {
-      if (chain[i].lastHash !== chain[i - 1].hash) {
+    }
+    for (let i = 1; i < chain.length; i++) { 
+      if (chain[i].lastHash !== chain[i - 1].hash) {console.log("err 2")
+
         return false;
       }
+
       if (Math.abs(chain[i - 1].defficulty - chain[i]) > 1) {
+        console.log("err 3")
         return false;
       }
+
       if (
-        chain[i].hash !==
-        cryptoHash(
-          chain[i].timeStamp,
-          chain[i].lastHash,
-          chain[i].data,
-          chain[i].defficulty,
-          chain[i].nonce
-        )
+        chain[i].hash !== 
+        cryptoHash(chain[i].timeStamp, chain[i].nonce, chain[i].difficulty, chain[i].lastHash, chain[i].data)
       ) {
+        console.log('err 4');
         return false;
       }
     }
