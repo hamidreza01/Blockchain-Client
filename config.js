@@ -1,3 +1,4 @@
+// config for the app
 const MINE_RATE = 10000;
 const DIFFICULTY = 10;
 const GENESIS_DATA = {
@@ -8,8 +9,16 @@ const GENESIS_DATA = {
   timeStamp: '0',
   data: ['DEX-BlockChain'],
 };
-
+const webServer = {
+  port : process.env.PORT || 23219
+}
+const app = {
+  debug : true,
+  root : `http://localhost:45451`
+}
 module.exports = {
+  webServerConfig : webServer,
+  appConfig : app,
   GENESIS_DATA,
   MINE_RATE,
 };
