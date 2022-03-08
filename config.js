@@ -14,11 +14,14 @@ const webServer = {
 }
 const app = {
   debug : true,
-  root : `http://localhost:45451`
+  rootSocketIP : '127.0.0.1',
+  rootSocketPORT : 3000,
 }
+const defBalance = 0;
 module.exports = {
   webServerConfig : webServer,
   appConfig : app,
   GENESIS_DATA,
   MINE_RATE,
+  defBalance
 };
