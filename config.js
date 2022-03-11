@@ -23,5 +23,5 @@ module.exports = {
   appConfig : app,
   GENESIS_DATA,
   MINE_RATE,
-  defBalance
+  defBalance : 0
 };

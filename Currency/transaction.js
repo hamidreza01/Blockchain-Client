@@ -19,6 +19,7 @@ class Transaction {
           amount : senderWallet.balance,
           signature : senderWallet.sign(outputMap)
       }
+      
   }
   static isValid(transaction){
     const {outputMap,input : {amount , address , signature}} = transaction;
@@ -34,6 +35,19 @@ class Transaction {
       return false;
     }
     return true;
+  }
+  update({recipient,amount,senderWallet}){
+    if(amount > this.outputMap[senderWallet.publicKey]){
+      throw new Error('amount exceeds balance')
+    }
+    if(!this.outputMap[recipient]){
+      this.outputMap[recipient] = amount;
+    }else{
+      this.outputMap[recipient] += amount;
+    }
+    
+    this.outputMap[senderWallet.publicKey] -= amount;
+    this.input = this.inputCreator({senderWallet,outputMap : this.outputMap})
   }
 }
 module.exports = Transaction;

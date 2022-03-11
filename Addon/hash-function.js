@@ -9,7 +9,7 @@ Args:
 
 const cryptoHash = (...inputs) => {
   const hash = crypto.createHash('sha256');
-  const dataHash = hash.update(inputs.sort().join(' '));
+  const dataHash = hash.update(inputs.sort().map(x => {return JSON.stringify(x)}).join(' '));
   return dataHash.digest('hex');
 };
 

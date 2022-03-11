@@ -5,10 +5,12 @@ describe("transaction", () => {
   let transaction, senderWallet, recipient, amount;
   beforeEach(() => {
     senderWallet = new Wallet();
+    senderWallet.balance = 80;
     recipient = "sender-public-key";
     amount = 30;
     transaction = new Transaction({ senderWallet, amount, recipient });
   });
+
   it("has an `id` ", () => {
     expect(transaction).toHaveProperty("id");
   });
@@ -71,4 +73,29 @@ describe("transaction", () => {
       });
     });
   });
+  describe('update()',()=>{
+    let lastSign, lastOutputMap, newRecepient , newAmount;
+    beforeEach(()=>{
+      lastSign = transaction.input.signature;
+      lastOutputMap = transaction.outputMap[senderWallet.publicKey];
+      newAmount = 50;
+      newRecepient = 'test-recepinet';
+      transaction.update({senderWallet,recipient : newRecepient,amount : newAmount});
+    })   
+
+    it("output new amount",()=>{
+      expect(transaction.outputMap[newRecepient]).toEqual(newAmount);
+    })
+    it("sub the amount from senderAmount",()=>{
+      expect(transaction.outputMap[senderWallet.publicKey]).toEqual( lastOutputMap - newAmount );
+    })
+    it('total output value',()=>{
+      expect(Object.values(transaction.outputMap).reduce((total,value)=>{
+        return total + value;
+      })).toEqual(transaction.input.amount);
+    })
+    it("re-sign the transaction",()=>{
+      expect(transaction.input.signature).not.toEqual(lastSign);
+    })
+  })
 });
