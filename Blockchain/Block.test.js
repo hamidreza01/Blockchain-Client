@@ -1,6 +1,6 @@
 const Block = require('./Block');
-const { GENESIS_DATA } = require('./config');
-const cryptoHash = require('./hash-function');
+const { GENESIS_DATA } = require('../config');
+const cryptoHash = require('./../Addon/hash-function');
 
 describe(' `Block` class', () => {
   let timeStamp = 'time-test';

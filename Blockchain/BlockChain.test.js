@@ -22,9 +22,8 @@ describe('BlockChain', () => {
     });
     blockChain.addBlock({ data: 'test' });
     it('add block test', () => {
-      expect(blockChain.chain[1].data === testBlock.data).toEqual(true);
-      expect(blockChain.chain[1].hash === testBlock.hash).toEqual(true);
-      expect(blockChain.chain[1].lastHash === testBlock.lastHash).toEqual(true);
+      expect(blockChain.chain[1].data === testBlock.data).toBe(true);
+      expect(blockChain.chain[1].lastHash === testBlock.lastHash).toBe(true);
     });
   });
   describe('isValid()', () => {

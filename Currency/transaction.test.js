@@ -48,4 +48,27 @@ describe("transaction", () => {
       ).toBe(true);
     });
   });
+  describe("Transaction.isValid()", () => {
+    console.error = jest.fn();
+    it("have isValid method", () => {
+      expect(Transaction.isValid).not.toBe(undefined);
+    });
+    describe("is valid", () => {
+      it("return true", () => {
+        expect(Transaction.isValid(transaction)).toBe(true);
+      });
+    });
+    describe("is not valid", () => {
+      it("invalid outputMap value", () => {
+        transaction.outputMap[senderWallet.publicKey] = 1400;
+        expect(Transaction.isValid(transaction)).toBe(false);
+        expect(console.error).toHaveBeenCalled();
+      });
+      it("invalid input signature", () => {
+        transaction.input.signature = "invalidSign";
+        expect(Transaction.isValid(transaction)).toBe(false);
+        expect(console.error).toHaveBeenCalled();
+      });
+    });
+  });
 });

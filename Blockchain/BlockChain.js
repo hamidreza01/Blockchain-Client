@@ -22,19 +22,16 @@ class BlockChain {
   static isValid(chain) {
     // check if genesis block
     if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis())) {
-      console.log("err 1");
       return false;
     }
     for (let i = 1; i < chain.length; i++) {
       // check if chain has the same hash
       if (chain[i].lastHash !== chain[i - 1].hash) {
-        console.log("err 2");
 
         return false;
       }
 
       if (Math.abs(chain[i - 1].defficulty - chain[i]) > 1) {
-        console.log("err 3");
         return false;
       }
 
@@ -49,7 +46,6 @@ class BlockChain {
           chain[i].data
         )
       ) {
-        console.log("err 4");
         return false;
       }
     }
@@ -71,4 +67,5 @@ class BlockChain {
     console.log("replace chain with : ", chain);
   }
 }
+
 module.exports = BlockChain;
