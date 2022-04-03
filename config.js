@@ -1,27 +1,16 @@
-// config for the app
-const MINE_RATE = 10000;
-const DIFFICULTY = 10;
-const GENESIS_DATA = {
-  hash: 'DEXhash',
-  lastHash: 'dexLastHash',
-  nonce: 0,
-  difficulty: DIFFICULTY,
-  timeStamp: '0',
-  data: ['DEX-BlockChain'],
-};
-const webServer = {
-  port : process.env.PORT || 23219
-}
-const app = {
-  debug : true,
-  rootSocketIP : '127.0.0.1',
-  rootSocketPORT : 3000,
-}
-const defBalance = 0;
-module.exports = {
-  webServerConfig : webServer,
-  appConfig : app,
-  GENESIS_DATA,
-  MINE_RATE,
-  defBalance : 0
+"use strict";
+exports.__esModule = true;
+exports.config = void 0;
+var DEFUALT_DIFFICULTY = 3;
+exports.config = {
+    MINE_RATE: 1000,
+    GENESIS_DATA: {
+        hash: "DEXhash",
+        lastHash: "dexLastHash",
+        nonce: 0,
+        difficulty: DEFUALT_DIFFICULTY,
+        timestamp: 0,
+        data: ["DEX-BlockChain"]
+    },
+    DEFUALT_BALANCE: 0
 };

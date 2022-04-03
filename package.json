@@ -1,26 +1,12 @@
 {
   "dependencies": {
-    "@types/jest": "^27.4.0",
-    "@types/node": "^17.0.17",
-    "axios": "^0.26.0",
-    "cls.js": "^1.4.0",
+    "@types/node": "^17.0.23",
+    "cls.js": "^1.5.0",
     "elliptic": "^6.5.4",
-    "express": "^4.17.3",
     "hex-to-bin": "^1.0.1",
-    "hex-to-binary": "^1.0.1",
-    "jest": "^27.5.1",
-    "uuid": "^8.3.2"
+    "hex-to-binary": "^1.0.1"
   },
-  "jest": {
-    "testEnvironment": "node"
-  },
-  "name": "dpx",
-  "version": "1.0.0",
-  "main": "Block.js",
-  "scripts": {
-    "test": "jest"
-  },
-  "author": "",
-  "license": "MIT",
-  "description": ""
+  "devDependencies": {
+    "@types/elliptic": "^6.4.14"
+  }
 }
