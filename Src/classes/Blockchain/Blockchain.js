@@ -30,10 +30,10 @@ var Blockchain = /** @class */ (function () {
     };
     Blockchain.prototype.replaceChain = function (chain) {
         if (chain.length < this.chain.length) {
-            return "chain is short";
+            return { message: "chain is short", code: 101 };
         }
         if (!Blockchain.isValid(chain)) {
-            return "chain is not valid";
+            return { message: "chain is not valid", code: 102 };
         }
         this.chain = chain;
         return "replaced chain with : " + chain;

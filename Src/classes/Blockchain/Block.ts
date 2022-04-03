@@ -1,7 +1,7 @@
 import { config } from "../../../config";
 import { hashCreator } from "../../Addon/hash-creator";
 import { _Block } from "../../interfaces/Blockchain/_Block";
-import { Block_types } from "../../types/Block_types";
+
 import hexToBin from "hex-to-bin";
 
 export class Block implements _Block {
@@ -13,10 +13,10 @@ export class Block implements _Block {
     public nonce: number,
     public difficulty: number
   ) {}
-  static genesis(): Block_types {
+  static genesis(): _Block {
     return config.GENESIS_DATA;
   }
-  static mineBlock(lastBlock: Block_types, data: Array<any>): Block_types {
+  static mineBlock(lastBlock: _Block, data: Array<any>): _Block {
     const { hash: lastHash } = lastBlock;
     let difficulty = lastBlock.difficulty;
     let nonce = 0;
@@ -37,7 +37,7 @@ export class Block implements _Block {
       return new Block(timestamp, data, hash, lastHash, nonce, difficulty);
     }
   }
-  static adJustDifficulty(lastBlock: Block_types, timestamp: number) {
+  static adJustDifficulty(lastBlock: _Block, timestamp: number) {
     if (lastBlock.difficulty < 1) return 1;
     if (timestamp - lastBlock.timestamp > config.MINE_RATE)
       return lastBlock.difficulty - 1;

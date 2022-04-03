@@ -6,7 +6,7 @@ exports.__esModule = true;
 exports.verify = exports.ec = void 0;
 var elliptic_1 = __importDefault(require("elliptic"));
 var hash_creator_1 = require("./hash-creator");
-exports.ec = new elliptic_1["default"].ec("secp256k1");
+exports.ec = new elliptic_1["default"].ec("ed25519");
 var verify = function (data, sign, publicKey) {
     var vrf = exports.ec.keyFromPublic(publicKey, "hex");
     try {

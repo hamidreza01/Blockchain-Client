@@ -8,7 +8,7 @@ var Wallet = /** @class */ (function () {
     function Wallet() {
         this.balance = config_1.config.DEFUALT_BALANCE;
         this.keyPair = sign_1.ec.genKeyPair();
-        this.publicKey = this.keyPair.getPublic().encode("hex");
+        this.publicKey = this.keyPair.getPublic().encode('hex');
     }
     Wallet.prototype.sign = function (data) {
         return this.keyPair.sign((0, hash_creator_1.hashCreator)(JSON.stringify(data)));

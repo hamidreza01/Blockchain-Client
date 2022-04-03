@@ -4,9 +4,12 @@
     "cls.js": "^1.5.0",
     "elliptic": "^6.5.4",
     "hex-to-bin": "^1.0.1",
-    "hex-to-binary": "^1.0.1"
+    "hex-to-binary": "^1.0.1",
+    "uniqid": "^5.4.0"
   },
   "devDependencies": {
-    "@types/elliptic": "^6.4.14"
+    "@types/elliptic": "^6.4.14",
+    "@types/uniqid": "^5.3.2",
+    "@types/uuid": "^8.3.4"
   }
 }

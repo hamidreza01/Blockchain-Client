@@ -1,6 +1,7 @@
 import { hashCreator } from "../../Addon/hash-creator";
 import { _Blockchain } from "../../interfaces/Blockchain/_Blockchain";
-import { Block_types } from "../../types/Block_types";
+import { _Errors } from "../../interfaces/Blockchain/_Errors";
+import { _Block } from "../../interfaces/Blockchain/_Block";
 import { Block } from "./Block";
 export class Blockchain implements _Blockchain {
   chain = [Block.genesis()];
@@ -8,7 +9,7 @@ export class Blockchain implements _Blockchain {
     const block = Block.mineBlock(this.chain[this.chain.length - 1], data);
     this.chain.push(block);
   }
-  static isValid(chain: Block_types[]): boolean {
+  static isValid(chain: Array<_Block>): boolean {
     if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis()))
       return false;
     for (let i = 1; i < chain.length; i++) {
@@ -24,7 +25,7 @@ export class Blockchain implements _Blockchain {
       ) {
         return false;
       }
-    
+
       if (chain[i].lastHash !== chain[i - 1].hash) {
         return false;
       }
@@ -34,12 +35,12 @@ export class Blockchain implements _Blockchain {
     }
     return true;
   }
-  replaceChain(chain: Array<any>): string | boolean {
+  replaceChain(chain: Array<any>): _Errors | string {
     if (chain.length < this.chain.length) {
-      return "chain is short";
+      return { message: "chain is short", code: 101 };
     }
     if (!Blockchain.isValid(chain)) {
-      return "chain is not valid";
+      return { message: "chain is not valid", code: 102 };
     }
     this.chain = chain;
     return "replaced chain with : " + chain;

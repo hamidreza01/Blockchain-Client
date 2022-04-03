@@ -1,6 +1,6 @@
 const DEFUALT_DIFFICULTY = 3;
-import { Block_types } from "./Src/types/Block_types";
-export const config: { MINE_RATE: number; GENESIS_DATA: Block_types; DEFUALT_BALANCE : number} = {
+import { _Block } from "./Src/interfaces/Blockchain/_Block";
+export const config: { MINE_RATE: number; GENESIS_DATA: _Block; DEFUALT_BALANCE : number} = {
   MINE_RATE: 1000,
   GENESIS_DATA: {
     hash: "DEXhash",
