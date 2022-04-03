@@ -2,4 +2,4 @@
 -- Validation - 100
 --- 101 - chain is short 
 --- 102 - chain is not valid
--- 111 - invalid transaction
+--- 111 - invalid transaction
