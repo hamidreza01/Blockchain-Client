@@ -1,14 +1,17 @@
 {
   "dependencies": {
     "@types/node": "^17.0.23",
+    "axios": "^0.26.1",
     "cls.js": "^1.5.0",
     "elliptic": "^6.5.4",
+    "express": "^4.17.3",
     "hex-to-bin": "^1.0.1",
     "hex-to-binary": "^1.0.1",
     "uniqid": "^5.4.0"
   },
   "devDependencies": {
     "@types/elliptic": "^6.4.14",
+    "@types/express": "^4.17.13",
     "@types/uniqid": "^5.3.2",
     "@types/uuid": "^8.3.4"
   }

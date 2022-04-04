@@ -1,6 +1,6 @@
 import { hashCreator } from "../../Addon/hash-creator";
 import { _Blockchain } from "../../interfaces/Blockchain/_Blockchain";
-import { _Errors } from "../../interfaces/Blockchain/_Errors";
+import { _Errors } from "../../types/errors_interface";
 import { _Block } from "../../interfaces/Blockchain/_Block";
 import { Block } from "./Block";
 export class Blockchain implements _Blockchain {
@@ -35,7 +35,7 @@ export class Blockchain implements _Blockchain {
     }
     return true;
   }
-  replaceChain(chain: Array<any>): _Errors | string {
+  replaceChain(chain: Array<any>): _Errors | boolean {
     if (chain.length < this.chain.length) {
       return { message: "chain is short", code: 101 };
     }
@@ -43,6 +43,6 @@ export class Blockchain implements _Blockchain {
       return { message: "chain is not valid", code: 102 };
     }
     this.chain = chain;
-    return "replaced chain with : " + chain;
+    return true;
   }
 }

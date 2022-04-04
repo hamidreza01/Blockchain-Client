@@ -36,7 +36,7 @@ var Blockchain = /** @class */ (function () {
             return { message: "chain is not valid", code: 102 };
         }
         this.chain = chain;
-        return "replaced chain with : " + chain;
+        return true;
     };
     return Blockchain;
 }());

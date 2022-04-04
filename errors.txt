@@ -1,5 +1,12 @@
 - errors list 
--- Validation - 100
+
+-- 100 - validation 
+
 --- 101 - chain is short 
 --- 102 - chain is not valid
--- 111 - invalid transaction
+--- 111 - invalid transaction
+
+-- 200 - connection
+
+--- 250 - error connecting to the root server
+--- 251 - connect to the root server of timeout

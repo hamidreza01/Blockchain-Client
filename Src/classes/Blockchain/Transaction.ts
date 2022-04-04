@@ -1,7 +1,7 @@
 import { _Transaction } from "../../interfaces/Blockchain/_Transaction";
 import { _Wallet } from "../../interfaces/Blockchain/_Wallet";
 import uniqid from "uniqid";
-import { _Errors } from "../../interfaces/Blockchain/_Errors";
+import { _Errors } from "../../types/errors_interface";
 import { verify } from "../../Addon/sign";
 import { inputMap_type } from "../../types/inputMap_types";
 export class Transaction implements _Transaction {
