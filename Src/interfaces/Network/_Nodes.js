@@ -1,2 +1,2 @@
 "use strict";
-// farda ishallah
+exports.__esModule = true;

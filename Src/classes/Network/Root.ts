@@ -4,30 +4,37 @@ import { config } from "../../../config";
 import net from "net";
 import { _Block } from "../../interfaces/Blockchain/_Block";
 export class Root implements _Root {
-  private client = net.createConnection({
-    port: config.ROOT_PORT,
-    host: config.ROOT_URL,
-    localPort : 1231
-  });
-  private classData: Array<{ betName: string; callBack: Function }> = [{
-    betName: "genesis",
-    callBack: () => {},
-  }];
+  private client: any;
+  constructor(private port: number) {
+    this.client = net.createConnection({
+      port: config.ROOT_PORT,
+      host: config.ROOT_URL,
+      localPort: port,
+    });
+  }
+  private classData: Array<{ betName: string; callBack: Function }> = [
+    {
+      betName: "genesis",
+      callBack: () => {
+        console.log('oops, im genesis')
+      },
+    },
+  ];
   start(): Promise<_Errors | boolean> {
-    this.client.on("data",(data : any)=>{
-      console.dir(data.toString())
+    this.client.on("data", (data: any) => {
+      console.dir(data.toString());
       try {
         data = JSON.parse(data.toString());
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-      let better = this.classData.find((x)=>{
-        return x.betName === data.action
-      })
-      if(better){
-        better.callBack(data.data ? data.data : undefined)
+      let better = this.classData.find((x) => {
+        return x.betName === data.action;
+      });
+      if (better) {
+        better.callBack(data.data ? data.data : undefined);
       }
-    })
+    });
     return new Promise((res, rej) => {
       this.client.on("connect", () => {
         res(true);
@@ -41,7 +48,7 @@ export class Root implements _Root {
     });
   }
   addMe(): void | _Errors {
-    this.client.write(JSON.stringify({action : 'addMe'}));
+    this.client.write(JSON.stringify({ action: "addMe" }));
     this.client.on("timeout", () => {
       return { message: "connect to the root server of timeout", code: 251 };
     });
@@ -49,8 +56,10 @@ export class Root implements _Root {
       return { message: "error connecting to the root server", code: 250 };
     });
   }
-  giveData(chain : Array<_Block>,nodeList : Array<string>): void | _Errors {
-    this.client.write(JSON.stringify({action : 'giveMeData',data : {chain,nodeList}}));
+  giveData(chain: Array<_Block>, nodeList: Array<string>): void | _Errors {
+    this.client.write(
+      JSON.stringify({ action: "giveMeData", data: { chain, nodeList } })
+    );
     this.client.on("timeout", () => {
       return { message: "connect to the root server of timeout", code: 251 };
     });
@@ -58,7 +67,7 @@ export class Root implements _Root {
       return { message: "error connecting to the root server", code: 250 };
     });
   }
-  bet(betName : string, callBack : Function) : void {
-    this.classData.push({betName,callBack});
-  } ;
+  bet(betName: string, callBack: Function): void {
+    this.classData.push({ betName, callBack });
+  }
 }

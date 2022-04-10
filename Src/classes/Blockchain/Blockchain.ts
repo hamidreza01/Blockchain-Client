@@ -35,7 +35,7 @@ export class Blockchain implements _Blockchain {
     }
     return true;
   }
-  replaceChain(chain: Array<any>): _Errors | boolean {
+  replaceChain(chain: Array<_Block>): _Errors | boolean {
     if (chain.length < this.chain.length) {
       return { message: "chain is short", code: 101 };
     }

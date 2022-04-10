@@ -3,10 +3,13 @@
 -- 100 - validation 
 
 --- 101 - chain is short 
---- 102 - chain is not valid
+--- 102 - chain is invalid
 --- 111 - invalid transaction
+--- 112 - amount exceeds balance
 
 -- 200 - connection
 
 --- 250 - error connecting to the root server
 --- 251 - connect to the root server of timeout
+
+

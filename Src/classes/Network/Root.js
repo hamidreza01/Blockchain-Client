@@ -7,16 +7,21 @@ exports.Root = void 0;
 var config_1 = require("../../../config");
 var net_1 = __importDefault(require("net"));
 var Root = /** @class */ (function () {
-    function Root() {
+    function Root(port) {
+        this.port = port;
+        this.classData = [
+            {
+                betName: "genesis",
+                callBack: function () {
+                    console.log('oops, im genesis');
+                }
+            },
+        ];
         this.client = net_1["default"].createConnection({
             port: config_1.config.ROOT_PORT,
             host: config_1.config.ROOT_URL,
-            localPort: 1231
+            localPort: port
         });
-        this.classData = [{
-                betName: "genesis",
-                callBack: function () { }
-            }];
     }
     Root.prototype.start = function () {
         var _this = this;
@@ -48,7 +53,7 @@ var Root = /** @class */ (function () {
         });
     };
     Root.prototype.addMe = function () {
-        this.client.write(JSON.stringify({ action: 'addMe' }));
+        this.client.write(JSON.stringify({ action: "addMe" }));
         this.client.on("timeout", function () {
             return { message: "connect to the root server of timeout", code: 251 };
         });
@@ -57,7 +62,7 @@ var Root = /** @class */ (function () {
         });
     };
     Root.prototype.giveData = function (chain, nodeList) {
-        this.client.write(JSON.stringify({ action: 'giveMeData', data: { chain: chain, nodeList: nodeList } }));
+        this.client.write(JSON.stringify({ action: "giveMeData", data: { chain: chain, nodeList: nodeList } }));
         this.client.on("timeout", function () {
             return { message: "connect to the root server of timeout", code: 251 };
         });
@@ -68,7 +73,6 @@ var Root = /** @class */ (function () {
     Root.prototype.bet = function (betName, callBack) {
         this.classData.push({ betName: betName, callBack: callBack });
     };
-    ;
     return Root;
 }());
 exports.Root = Root;

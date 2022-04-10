@@ -6,13 +6,13 @@ import { verify } from "../../Addon/sign";
 import { inputMap_type } from "../../types/inputMap_types";
 export class Transaction implements _Transaction {
   id: string = uniqid();
-  public outputMap: Object = {};
-  public inputMap: inputMap_type =  {
+  public outputMap: any = {};
+  public inputMap: inputMap_type = {
     timestamp: 0,
-    address: '',
+    address: "",
     amount: 0,
-    signature: {s : "" ,r : ""},
-  };;
+    signature: { s: "", r: "" },
+  };
   constructor(senderWallet: _Wallet, amount: number, recpient: string) {
     (this.outputMap = this.outputMapCreator(senderWallet, amount, recpient)),
       (this.inputMap = this.inputMapCreator(senderWallet, this.outputMap));
@@ -35,15 +35,42 @@ export class Transaction implements _Transaction {
     outputMap[recipient] = amount;
     return outputMap;
   }
+  update(
+    recpient: string,
+    amount: number,
+    senderWallet: _Wallet
+  ): void | _Errors {
+    if (this.outputMap[senderWallet.publicKey] < amount) {
+      return { message: "amount exceeds balance", code: 112 };
+    } 
+    if(this.outputMap[recpient]){
+      this.outputMap[recpient] += amount
+    }else{
+      this.outputMap[recpient] = amount;
+    }
+    this.inputMap = this.inputMapCreator(senderWallet,this.outputMap)
+  }
   static isValid(transaction: _Transaction): _Errors | boolean {
-    let total = Object.values(transaction.outputMap).reduce((all, val) => {
-      return all + val;
+    let total = Object.values(transaction.outputMap).reduce((all, val: any) => {
+      return (all as number) + val;
     });
     if (total !== transaction.inputMap.amount) {
-      return {message : `invalid transaction from ${transaction.inputMap.address}` , code : 111}
+      return {
+        message: `invalid transaction from ${transaction.inputMap.address}`,
+        code: 111,
+      };
     }
-    if (!verify(transaction.outputMap,transaction.inputMap.signature,transaction.inputMap.address)) {
-      return {message : `invalid transaction from ${transaction.inputMap.address}` , code : 112}
+    if (
+      !verify(
+        transaction.outputMap,
+        transaction.inputMap.signature,
+        transaction.inputMap.address
+      )
+    ) {
+      return {
+        message: `invalid transaction from ${transaction.inputMap.address}`,
+        code: 112,
+      };
     }
     return true;
   }

@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __generator = (this && this.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
     return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
@@ -26,18 +35,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }
-var __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var g = generator.apply(thisArg, _arguments || []), i, q = [];
-    return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
-    function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
-    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
-    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
-    function fulfill(value) { resume("next", value); }
-    function reject(value) { resume("throw", value); }
-    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -46,8 +43,9 @@ exports.Nodes = void 0;
 var express_1 = __importDefault(require("express"));
 var axios_1 = __importDefault(require("axios"));
 var Nodes = /** @class */ (function () {
-    function Nodes() {
-        this.list = [''];
+    function Nodes(port) {
+        this.port = port;
+        this.list = [""];
         this.app = (0, express_1["default"])();
     }
     Nodes.prototype.start = function (blockChain) {
@@ -56,14 +54,25 @@ var Nodes = /** @class */ (function () {
         this.app.use(express_1["default"].json());
         this.app.post("/replaceChain", function (req, res) {
             var replaceResualt = _this.blockChain.replaceChain(req.body.chain);
-            if (!replaceResualt.code) {
-                return res.send("ok, replace chain my chain is : " + _this.blockChain.chain);
+            console.log(_this.blockChain.chain);
+            if (replaceResualt.message) {
+                res.send(replaceResualt);
             }
-            return res.send(replaceResualt);
+            else {
+                res.send("ok, replace chain my chain is : " + _this.blockChain.chain);
+            }
+        });
+        this.app.post("/addBlock", function (req, res) {
+            _this.blockChain.addBlock(req.body.data);
+            _this.broadcast(_this.blockChain.chain);
+            res.send(_this.blockChain.chian);
+        });
+        this.app.listen(this.port, function () {
+            console.log("Api run in", _this.port);
         });
     };
     Nodes.prototype.broadcast = function (chain) {
-        return __asyncGenerator(this, arguments, function broadcast_1() {
+        return __awaiter(this, void 0, void 0, function () {
             var i;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -71,17 +80,15 @@ var Nodes = /** @class */ (function () {
                         i = 0;
                         _a.label = 1;
                     case 1:
-                        if (!(i < this.list.length)) return [3 /*break*/, 6];
-                        return [4 /*yield*/, __await(axios_1["default"].post(this.list[i]))];
-                    case 2: return [4 /*yield*/, __await.apply(void 0, [_a.sent()])];
-                    case 3: return [4 /*yield*/, _a.sent()];
-                    case 4:
+                        if (!(i < this.list.length)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, axios_1["default"].post("http://".concat(this.list[i], "/replaceChain"), { chain: chain })];
+                    case 2:
                         _a.sent();
-                        _a.label = 5;
-                    case 5:
+                        _a.label = 3;
+                    case 3:
                         i++;
                         return [3 /*break*/, 1];
-                    case 6: return [2 /*return*/];
+                    case 4: return [2 /*return*/];
                 }
             });
         });

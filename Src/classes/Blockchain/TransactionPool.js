@@ -8,6 +8,10 @@ var TransactionPool = /** @class */ (function () {
     TransactionPool.prototype.add = function (transaction) {
         this.transactionMap[transaction.id] = transaction;
     };
+    TransactionPool.prototype.isHave = function (wallet) {
+        var val = this.transactionMap.values();
+        return val.find(function (x) { return x.inputMap.address === wallet.publicKey; });
+    };
     return TransactionPool;
 }());
 exports.TransactionPool = TransactionPool;

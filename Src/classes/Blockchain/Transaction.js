@@ -12,14 +12,13 @@ var Transaction = /** @class */ (function () {
         this.outputMap = {};
         this.inputMap = {
             timestamp: 0,
-            address: '',
+            address: "",
             amount: 0,
             signature: { s: "", r: "" }
         };
         (this.outputMap = this.outputMapCreator(senderWallet, amount, recpient)),
             (this.inputMap = this.inputMapCreator(senderWallet, this.outputMap));
     }
-    ;
     Transaction.prototype.inputMapCreator = function (senderWallet, outputMap) {
         return {
             timestamp: Date.now(),
@@ -34,15 +33,33 @@ var Transaction = /** @class */ (function () {
         outputMap[recipient] = amount;
         return outputMap;
     };
+    Transaction.prototype.update = function (recpient, amount, senderWallet) {
+        if (this.outputMap[senderWallet.publicKey] < amount) {
+            return { message: "amount exceeds balance", code: 112 };
+        }
+        if (this.outputMap[recpient]) {
+            this.outputMap[recpient] += amount;
+        }
+        else {
+            this.outputMap[recpient] = amount;
+        }
+        this.inputMap = this.inputMapCreator(senderWallet, this.outputMap);
+    };
     Transaction.isValid = function (transaction) {
         var total = Object.values(transaction.outputMap).reduce(function (all, val) {
             return all + val;
         });
         if (total !== transaction.inputMap.amount) {
-            return { message: "invalid transaction from ".concat(transaction.inputMap.address), code: 111 };
+            return {
+                message: "invalid transaction from ".concat(transaction.inputMap.address),
+                code: 111
+            };
         }
         if (!(0, sign_1.verify)(transaction.outputMap, transaction.inputMap.signature, transaction.inputMap.address)) {
-            return { message: "invalid transaction from ".concat(transaction.inputMap.address), code: 112 };
+            return {
+                message: "invalid transaction from ".concat(transaction.inputMap.address),
+                code: 112
+            };
         }
         return true;
     };
