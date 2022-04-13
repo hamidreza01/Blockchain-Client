@@ -9,8 +9,15 @@ var TransactionPool = /** @class */ (function () {
         this.transactionMap[transaction.id] = transaction;
     };
     TransactionPool.prototype.isHave = function (wallet) {
-        var val = this.transactionMap.values();
-        return val.find(function (x) { return x.inputMap.address === wallet.publicKey; });
+        var val = Object.values(this.transactionMap);
+        console.log(wallet.publicKey);
+        console.log(val.find(function (x) {
+            console.log(x.inputMap.address, wallet.publicKey);
+            return x.inputMap.address === wallet.publicKey;
+        }));
+        return val.find(function (x) {
+            return x.inputMap.address === wallet.publicKey;
+        });
     };
     return TransactionPool;
 }());

@@ -47,6 +47,7 @@ var Nodes = /** @class */ (function () {
         this.port = port;
         this.list = [""];
         this.app = (0, express_1["default"])();
+        this.classData = [];
     }
     Nodes.prototype.start = function (blockChain) {
         var _this = this;
@@ -64,14 +65,14 @@ var Nodes = /** @class */ (function () {
         });
         this.app.post("/addBlock", function (req, res) {
             _this.blockChain.addBlock(req.body.data);
-            _this.broadcast(_this.blockChain.chain);
+            _this.broadcast("replaceChain", _this.blockChain.chain);
             res.send(_this.blockChain.chian);
         });
         this.app.listen(this.port, function () {
             console.log("Api run in", _this.port);
         });
     };
-    Nodes.prototype.broadcast = function (chain) {
+    Nodes.prototype.broadcast = function (name, data) {
         return __awaiter(this, void 0, void 0, function () {
             var i;
             return __generator(this, function (_a) {
@@ -81,7 +82,7 @@ var Nodes = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         if (!(i < this.list.length)) return [3 /*break*/, 4];
-                        return [4 /*yield*/, axios_1["default"].post("http://".concat(this.list[i], "/replaceChain"), { chain: chain })];
+                        return [4 /*yield*/, axios_1["default"].post("http://".concat(this.list[i], "/").concat(name), data)];
                     case 2:
                         _a.sent();
                         _a.label = 3;
@@ -91,6 +92,12 @@ var Nodes = /** @class */ (function () {
                     case 4: return [2 /*return*/];
                 }
             });
+        });
+    };
+    Nodes.prototype.bet = function (name, callback) {
+        this.app.post("/" + name, function (req, res) {
+            callback(req.body);
+            res.send("ok");
         });
     };
     return Nodes;

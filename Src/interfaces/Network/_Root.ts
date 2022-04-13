@@ -5,5 +5,5 @@ export interface _Root {
   start: () => Promise<_Errors | boolean>;
   addMe: () => void | _Errors;
   giveData : (chain : Array<_Block>,nodeList : Array<string>) => void | _Errors;
-  bet: (betName : string , callBack : Function) => void;
+  bet: (name : string, callback : Function) => void;
 }
