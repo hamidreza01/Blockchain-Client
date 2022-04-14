@@ -51,6 +51,7 @@ export class Transaction implements _Transaction {
     this.inputMap = this.inputMapCreator(senderWallet,this.outputMap)
   }
   static isValid(transaction: _Transaction): _Errors | boolean {
+    
     let total = Object.values(transaction.outputMap).reduce((all, val: any) => {
       return (all as number) + val;
     });

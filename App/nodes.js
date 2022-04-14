@@ -1,8 +1,16 @@
 "use strict";
 exports.__esModule = true;
-function default_1(nodes, blockchain) {
-    nodes.bet("replaceChain", function (data) {
+var Transaction_1 = require("../Src/classes/Blockchain/Transaction");
+function default_1(nodes, blockchain, transactionPool) {
+    nodes.bet("chain", function (data) {
         blockchain.replaceChain(data);
+    });
+    nodes.bet("transaction", function (data) {
+        var check = Transaction_1.Transaction.isValid(data);
+        if (check !== true) {
+            return;
+        }
+        transactionPool.add(data);
     });
 }
 exports["default"] = default_1;

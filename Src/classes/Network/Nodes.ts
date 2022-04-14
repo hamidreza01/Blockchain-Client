@@ -12,20 +12,13 @@ export class Nodes implements _Nodes {
   start(blockChain: _Blockchain): void {
     this.blockChain = blockChain;
     this.app.use(express.json());
-    this.app.post("/replaceChain", (req, res) => {
-      let replaceResualt = this.blockChain.replaceChain(req.body.chain);
-      console.log(this.blockChain.chain);
-
-      if (replaceResualt.message) {
-        res.send(replaceResualt);
-      } else {
-        res.send("ok, replace chain my chain is : " + this.blockChain.chain);
-      }
-    });
     this.app.post("/addBlock", (req, res) => {
-      this.blockChain.addBlock(req.body.data);
-      this.broadcast("replaceChain", this.blockChain.chain);
+      this.blockChain.addBlock(['test']);
+      this.broadcast("chain", this.blockChain.chain);
       res.send(this.blockChain.chian);
+    });
+    this.app.post("/blocks", (req, res) => {
+      res.send(this.blockChain.chain);
     });
     this.app.listen(this.port, () => {
       console.log("Api run in", this.port);
@@ -33,12 +26,18 @@ export class Nodes implements _Nodes {
   }
   async broadcast(name: string, data: any): Promise<void> {
     for (let i = 0; i < this.list.length; i++) {
-      await axios.post(`http://${this.list[i]}/${name}`, data);
+      try {
+        await axios.post(`http://${this.list[i]}/${name}`, data);
+        console.log(`success send ${this.list[i]} with ${name} channel`);
+      } catch (error) {
+        console.log(`Error brodcast to ${this.list[i]} with ${name} channel`);
+      }
     }
   }
   bet(name: string, callback: Function): void {
+    this.app.use(express.json());
     this.app.post("/" + name, (req, res) => {
-      callback(req.body);
+      callback(req.body)
       res.send("ok");
     });
   }

@@ -19,7 +19,9 @@ var transactionPool = new TransactionPool_1.TransactionPool();
 app.use(express_1["default"].json());
 app.post("/addTransaction", function (req, res) {
     var _a = req.body, recipient = _a.recipient, amount = _a.amount;
-    var transaction = transactionPool.isHave(wallet);
+    console.log(recipient);
+    var transaction;
+    transaction = transactionPool.isHave(wallet);
     if (transaction !== undefined) {
         transaction.update(recipient, amount, wallet);
         return res.send(transactionPool.transactionMap);
@@ -29,10 +31,11 @@ app.post("/addTransaction", function (req, res) {
         return res.status(400).json(transaction);
     }
     transactionPool.add(transaction);
+    nodes.broadcast("transaction", transaction);
     res.send(transactionPool.transactionMap);
 });
-app.listen(2161, function () {
-    console.log("app test in 2161");
+app.listen(3103, function () {
+    console.log("Api run in", 3103);
 });
-(0, root_1["default"])(blockChain, nodes, port + 2);
-(0, nodes_1["default"])(nodes, blockChain);
+(0, root_1["default"])(blockChain, nodes, transactionPool, port + 2);
+(0, nodes_1["default"])(nodes, blockChain, transactionPool);

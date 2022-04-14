@@ -53,20 +53,13 @@ var Nodes = /** @class */ (function () {
         var _this = this;
         this.blockChain = blockChain;
         this.app.use(express_1["default"].json());
-        this.app.post("/replaceChain", function (req, res) {
-            var replaceResualt = _this.blockChain.replaceChain(req.body.chain);
-            console.log(_this.blockChain.chain);
-            if (replaceResualt.message) {
-                res.send(replaceResualt);
-            }
-            else {
-                res.send("ok, replace chain my chain is : " + _this.blockChain.chain);
-            }
-        });
         this.app.post("/addBlock", function (req, res) {
-            _this.blockChain.addBlock(req.body.data);
-            _this.broadcast("replaceChain", _this.blockChain.chain);
+            _this.blockChain.addBlock(['test']);
+            _this.broadcast("chain", _this.blockChain.chain);
             res.send(_this.blockChain.chian);
+        });
+        this.app.post("/blocks", function (req, res) {
+            res.send(_this.blockChain.chain);
         });
         this.app.listen(this.port, function () {
             console.log("Api run in", _this.port);
@@ -74,27 +67,36 @@ var Nodes = /** @class */ (function () {
     };
     Nodes.prototype.broadcast = function (name, data) {
         return __awaiter(this, void 0, void 0, function () {
-            var i;
+            var i, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         i = 0;
                         _a.label = 1;
                     case 1:
-                        if (!(i < this.list.length)) return [3 /*break*/, 4];
-                        return [4 /*yield*/, axios_1["default"].post("http://".concat(this.list[i], "/").concat(name), data)];
+                        if (!(i < this.list.length)) return [3 /*break*/, 6];
+                        _a.label = 2;
                     case 2:
-                        _a.sent();
-                        _a.label = 3;
+                        _a.trys.push([2, 4, , 5]);
+                        return [4 /*yield*/, axios_1["default"].post("http://".concat(this.list[i], "/").concat(name), data)];
                     case 3:
+                        _a.sent();
+                        console.log("success send ".concat(this.list[i], " with ").concat(name, " channel"));
+                        return [3 /*break*/, 5];
+                    case 4:
+                        error_1 = _a.sent();
+                        console.log("Error brodcast to ".concat(this.list[i], " with ").concat(name, " channel"));
+                        return [3 /*break*/, 5];
+                    case 5:
                         i++;
                         return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/];
+                    case 6: return [2 /*return*/];
                 }
             });
         });
     };
     Nodes.prototype.bet = function (name, callback) {
+        this.app.use(express_1["default"].json());
         this.app.post("/" + name, function (req, res) {
             callback(req.body);
             res.send("ok");

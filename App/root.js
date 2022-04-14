@@ -1,7 +1,7 @@
 "use strict";
 exports.__esModule = true;
 var Root_1 = require("../Src/classes/Network/Root");
-function default_1(blockChain, nodes, port) {
+function default_1(blockChain, nodes, transactionPool, port) {
     var root = new Root_1.Root(port);
     root
         .start()
@@ -14,6 +14,7 @@ function default_1(blockChain, nodes, port) {
     root.bet("welcome", function (data) {
         nodes.list = data.nodeList;
         blockChain.chain = data.chain;
+        transactionPool.transactionMap = data.transactionMap;
     });
     root.bet("sliceChain", function (data) {
         blockChain.chain = blockChain.chain.filter(function (x, i) {
