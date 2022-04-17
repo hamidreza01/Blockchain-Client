@@ -6,10 +6,6 @@ var TransactionPool = /** @class */ (function () {
         this.transactionMap = {};
     }
     TransactionPool.prototype.add = function (transaction) {
-        // const check = Transaction.isValid(transaction)
-        // if(check !== true){
-        //     return check as _Errors;
-        // } 
         this.transactionMap[transaction.id] = transaction;
     };
     TransactionPool.prototype.isHave = function (wallet) {
@@ -17,6 +13,18 @@ var TransactionPool = /** @class */ (function () {
         return val.find(function (x) {
             return x.inputMap.address === wallet.publicKey;
         });
+    };
+    TransactionPool.prototype.clear = function () {
+        this.transactionMap = {};
+    };
+    TransactionPool.prototype.clearBlockchainTransactions = function (chain) {
+        for (var i = 0; i < chain.length; i++) {
+            var block = chain[i];
+            for (var j = 0; j < block.data.transaction.length; j++) {
+                var tx = block.data.transaction[j];
+                delete this.transactionMap[tx.id];
+            }
+        }
     };
     return TransactionPool;
 }());

@@ -6,6 +6,10 @@
 --- 102 - chain is invalid
 --- 111 - invalid transaction
 --- 112 - amount exceeds balance
+--- 120 - chain data is empty
+--- 121 - reward transaction is invalid
+--- 122 - reward transaction length is invalid
+--- 123 - transaction amount is invalid
 
 -- 200 - connection
 

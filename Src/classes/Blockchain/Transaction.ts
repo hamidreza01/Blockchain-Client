@@ -4,6 +4,7 @@ import uniqid from "uniqid";
 import { _Errors } from "../../types/errors_interface";
 import { verify } from "../../Addon/sign";
 import { inputMap_type } from "../../types/inputMap_types";
+import { config } from "../../../config";
 export class Transaction implements _Transaction {
   id: string = uniqid();
   public outputMap: any = {};
@@ -13,9 +14,9 @@ export class Transaction implements _Transaction {
     amount: 0,
     signature: { s: "", r: "" },
   };
-  constructor(senderWallet: _Wallet, amount: number, recpient: string) {
-    (this.outputMap = this.outputMapCreator(senderWallet, amount, recpient)),
-      (this.inputMap = this.inputMapCreator(senderWallet, this.outputMap));
+  constructor(senderWallet: _Wallet, amount: number, recpient: string, inputMap?: inputMap_type, outputMap?: {}) {
+    (this.outputMap =  outputMap || this.outputMapCreator(senderWallet, amount, recpient)),
+      (this.inputMap = inputMap || this.inputMapCreator(senderWallet, this.outputMap));
   }
   inputMapCreator(senderWallet: _Wallet, outputMap: {}): inputMap_type {
     return {
@@ -51,7 +52,6 @@ export class Transaction implements _Transaction {
     this.inputMap = this.inputMapCreator(senderWallet,this.outputMap)
   }
   static isValid(transaction: _Transaction): _Errors | boolean {
-    
     let total = Object.values(transaction.outputMap).reduce((all, val: any) => {
       return (all as number) + val;
     });
@@ -74,5 +74,14 @@ export class Transaction implements _Transaction {
       };
     }
     return true;
+  }
+  static reward(minerWallet: _Wallet): _Transaction {
+    return new Transaction(
+      minerWallet,
+      0,
+      minerWallet.publicKey,
+      config.REWARD_TRANSACTION as any,
+      {[minerWallet.publicKey]: config.REWARD}
+    );
   }
 }

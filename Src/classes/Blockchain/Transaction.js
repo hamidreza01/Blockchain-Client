@@ -6,8 +6,9 @@ exports.__esModule = true;
 exports.Transaction = void 0;
 var uniqid_1 = __importDefault(require("uniqid"));
 var sign_1 = require("../../Addon/sign");
+var config_1 = require("../../../config");
 var Transaction = /** @class */ (function () {
-    function Transaction(senderWallet, amount, recpient) {
+    function Transaction(senderWallet, amount, recpient, inputMap, outputMap) {
         this.id = (0, uniqid_1["default"])();
         this.outputMap = {};
         this.inputMap = {
@@ -16,8 +17,8 @@ var Transaction = /** @class */ (function () {
             amount: 0,
             signature: { s: "", r: "" }
         };
-        (this.outputMap = this.outputMapCreator(senderWallet, amount, recpient)),
-            (this.inputMap = this.inputMapCreator(senderWallet, this.outputMap));
+        (this.outputMap = outputMap || this.outputMapCreator(senderWallet, amount, recpient)),
+            (this.inputMap = inputMap || this.inputMapCreator(senderWallet, this.outputMap));
     }
     Transaction.prototype.inputMapCreator = function (senderWallet, outputMap) {
         return {
@@ -62,6 +63,10 @@ var Transaction = /** @class */ (function () {
             };
         }
         return true;
+    };
+    Transaction.reward = function (minerWallet) {
+        var _a;
+        return new Transaction(minerWallet, 0, minerWallet.publicKey, config_1.config.REWARD_TRANSACTION, (_a = {}, _a[minerWallet.publicKey] = config_1.config.REWARD, _a));
     };
     return Transaction;
 }());

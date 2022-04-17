@@ -11,7 +11,9 @@ export default function (
 ) {
 
   nodes.bet("chain", (data: Array<_Block>) => {
-    blockchain.replaceChain(data);
+    if(blockchain.replaceChain(data) === true){
+      transactionPool.clearBlockchainTransactions(data)
+    };
   });
 
   nodes.bet("transaction", (data: _Transaction) => {

@@ -8,6 +8,7 @@ var Nodes_1 = require("../Src/classes/Network/Nodes");
 var express_1 = __importDefault(require("express"));
 var Wallet_1 = require("../Src/classes/Blockchain/Wallet");
 var TransactionPool_1 = require("../Src/classes/Blockchain/TransactionPool");
+var TransactionMiner_1 = require("../Src/classes/Blockchain/TransactionMiner");
 var root_1 = __importDefault(require("./root"));
 var nodes_1 = __importDefault(require("./nodes"));
 var blockChain = new Blockchain_1.Blockchain();
@@ -16,26 +17,19 @@ var nodes = new Nodes_1.Nodes(port);
 var app = (0, express_1["default"])();
 var wallet = new Wallet_1.Wallet();
 var transactionPool = new TransactionPool_1.TransactionPool();
-app.use(express_1["default"].json());
-app.post("/addTransaction", function (req, res) {
-    var _a = req.body, recipient = _a.recipient, amount = _a.amount;
-    console.log(recipient);
-    var transaction;
-    transaction = transactionPool.isHave(wallet);
-    if (transaction !== undefined) {
-        transaction.update(recipient, amount, wallet);
-        return res.send(transactionPool.transactionMap);
-    }
-    transaction = wallet.createTransaction(recipient, amount);
-    if (transaction.code) {
-        return res.status(400).json(transaction);
-    }
-    transactionPool.add(transaction);
-    nodes.broadcast("transaction", transaction);
-    res.send(transactionPool.transactionMap);
-});
-app.listen(3103, function () {
-    console.log("Api run in", 3103);
-});
+var transactionMiner = new TransactionMiner_1.TransactionMiner(transactionPool, blockChain, wallet, nodes);
 (0, root_1["default"])(blockChain, nodes, transactionPool, port + 2);
 (0, nodes_1["default"])(nodes, blockChain, transactionPool);
+// const testVal = new Wallet();
+// testVal.balance = 1000;
+// blockChain.addBlock({transaction : [new Transaction(testVal,200,wallet.publicKey)]})
+transactionMiner.mineTransaction();
+transactionMiner.mineTransaction();
+transactionMiner.mineTransaction();
+transactionPool.add(wallet.createTransaction('address', 1, blockChain.chain));
+transactionMiner.mineTransaction();
+// console.dir(blockChain.chain, { depth: null });
+console.log(Wallet_1.Wallet.calculateBalance(blockChain.chain, wallet.publicKey));
+console.log(Blockchain_1.Blockchain.isValid(blockChain.chain));
+console.log(blockChain.validTransactionData(blockChain.chain));
+// console.log(Wallet.calculateBalance(blockChain.chain, wallet.publicKey));

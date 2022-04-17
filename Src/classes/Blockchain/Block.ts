@@ -3,11 +3,12 @@ import { hashCreator } from "../../Addon/hash-creator";
 import { _Block } from "../../interfaces/Blockchain/_Block";
 
 import hexToBin from "hex-to-bin";
+import { _Transaction } from "../../interfaces/Blockchain/_Transaction";
 
 export class Block implements _Block {
   constructor(
     public timestamp: number,
-    public data: Array<any>,
+    public data: {transaction ?: [_Transaction]},
     public hash: string,
     public lastHash: string,
     public nonce: number,
@@ -16,7 +17,7 @@ export class Block implements _Block {
   static genesis(): _Block {
     return config.GENESIS_DATA;
   }
-  static mineBlock(lastBlock: _Block, data: Array<any>): _Block {
+  static mineBlock(lastBlock: _Block, data: {transaction ?: [_Transaction]}): _Block {
     const { hash: lastHash } = lastBlock;
     let difficulty = lastBlock.difficulty;
     let nonce = 0;
