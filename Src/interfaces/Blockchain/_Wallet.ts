@@ -5,6 +5,7 @@ export interface _Wallet {
     balance : number,
     keyPair : any,
     publicKey : string,
+    privateKey : string,
     sign : (data : any) => string;
     createTransaction : ( recipient : string, amount : number, chain : Array<_Block>) => (_Errors | _Transaction)
 } 

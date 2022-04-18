@@ -19,10 +19,14 @@ var TransactionMiner = /** @class */ (function () {
         this.nodes = nodes;
     }
     TransactionMiner.prototype.mineTransaction = function () {
-        var transactions = __spreadArray([Transaction_1.Transaction.reward(this.wallet)], Object.values(this.transactionPool.transactionMap), true);
-        this.blockchain.addBlock({ transaction: transactions });
-        this.nodes.broadcast("chain", this.blockchain.chain);
-        this.transactionPool.clear();
+        var _this = this;
+        return new Promise(function (res) {
+            var transactions = __spreadArray([Transaction_1.Transaction.reward(_this.wallet)], Object.values(_this.transactionPool.transactionMap), true);
+            _this.blockchain.addBlock({ transaction: transactions });
+            _this.nodes.broadcast("chain", _this.blockchain.chain);
+            _this.transactionPool.clear();
+            res();
+        });
     };
     return TransactionMiner;
 }());

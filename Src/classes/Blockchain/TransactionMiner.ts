@@ -9,11 +9,13 @@ import { _TransactionMiner } from "../../interfaces/Blockchain/_TransactionMiner
 export class TransactionMiner implements _TransactionMiner{
     constructor(private transactionPool : _TransactionPool, private blockchain : _Blockchain, private wallet : _Wallet, private nodes : _Nodes ){
     }
-    mineTransaction() : void {
-
-        const transactions =[Transaction.reward(this.wallet),...Object.values(this.transactionPool.transactionMap)];
-        this.blockchain.addBlock({transaction : transactions as any});
-        this.nodes.broadcast("chain",this.blockchain.chain);
-        this.transactionPool.clear();
+    mineTransaction() : Promise<void> {
+        return new Promise((res)=>{
+            const transactions =[Transaction.reward(this.wallet),...Object.values(this.transactionPool.transactionMap)];
+            this.blockchain.addBlock({transaction : transactions as any});
+            this.nodes.broadcast("chain",this.blockchain.chain);
+            this.transactionPool.clear();
+            res()
+        })
     }
 }

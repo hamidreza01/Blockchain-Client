@@ -10,7 +10,9 @@ var Wallet = /** @class */ (function () {
         this.balance = config_1.config.DEFUALT_BALANCE;
         this.keyPair = sign_1.ec.genKeyPair();
         this.publicKey = this.keyPair.getPublic().encode("hex");
+        this.privateKey = Buffer.from(JSON.stringify(this.keyPair.getPrivate()).replace(/\"/g, '')).toString("base64");
     }
+    // privateKey: string = this.keyPair.getPrivate();
     Wallet.prototype.sign = function (data) {
         return this.keyPair.sign((0, hash_creator_1.hashCreator)(JSON.stringify(data)));
     };

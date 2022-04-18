@@ -1,3 +1,3 @@
 export interface _TransactionMiner{
-    mineTransaction() : void;
+    mineTransaction() : Promise<void>;
 }

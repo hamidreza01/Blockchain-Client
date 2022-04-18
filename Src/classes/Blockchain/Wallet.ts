@@ -6,10 +6,13 @@ import { _Errors } from "../../types/errors_interface";
 import { _Transaction } from "../../interfaces/Blockchain/_Transaction";
 import { Transaction } from "./Transaction";
 import { _Block } from "../../interfaces/Blockchain/_Block";
+
 export class Wallet implements _Wallet {
   balance: number = config.DEFUALT_BALANCE;
   keyPair: any = ec.genKeyPair();
   publicKey: string = this.keyPair.getPublic().encode("hex");
+  privateKey: string = Buffer.from(JSON.stringify(this.keyPair.getPrivate()).replace(/\"/g,'')).toString("base64");
+  // privateKey: string = this.keyPair.getPrivate();
   sign(data: any): string {
     return this.keyPair.sign(hashCreator(JSON.stringify(data)));
   }
