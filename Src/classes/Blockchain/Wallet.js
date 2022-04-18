@@ -31,7 +31,7 @@ var Wallet = /** @class */ (function () {
                 var transaction = _d[_i];
                 if (((_c = transaction === null || transaction === void 0 ? void 0 : transaction.inputMap) === null || _c === void 0 ? void 0 : _c.address) === address) {
                     hasTransaction = true;
-                    break;
+                    // break;
                 }
                 var outputValue = void 0;
                 try {

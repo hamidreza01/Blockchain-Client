@@ -32,7 +32,7 @@ export class Wallet implements _Wallet {
       for (let transaction of chain[i]?.data?.transaction!) {
         if(transaction?.inputMap?.address === address){
           hasTransaction = true;
-          break;
+          // break;
         }
         let outputValue;
         try {

@@ -26,29 +26,11 @@ const wallet: _Wallet = new Wallet();
 
 const transactionPool: _TransactionPool = new TransactionPool();
 
-const transactionMiner : _TransactionMiner = new TransactionMiner(transactionPool,blockChain,wallet,nodes);
+const adminWallet: _Wallet = new Wallet();
 
+const transactionMiner : _TransactionMiner = new TransactionMiner(transactionPool,blockChain,wallet,nodes);
 
 
 rootFunction(blockChain, nodes, transactionPool, port + 2);
 nodesFunction(nodes, blockChain, transactionPool);
-// const testVal = new Wallet();
-// testVal.balance = 1000;
-// blockChain.addBlock({transaction : [new Transaction(testVal,200,wallet.publicKey)]})
 
-transactionMiner.mineTransaction();
-
-transactionMiner.mineTransaction();
-
-transactionMiner.mineTransaction();
-transactionPool.add(wallet.createTransaction('address', 1, blockChain.chain) as _Transaction);
-
-transactionMiner.mineTransaction();
-
-// console.dir(blockChain.chain, { depth: null });
-console.log(Wallet.calculateBalance(blockChain.chain, wallet.publicKey));
-
-
-console.log(Blockchain.isValid(blockChain.chain));
-console.log(blockChain.validTransactionData(blockChain.chain));
-// console.log(Wallet.calculateBalance(blockChain.chain, wallet.publicKey));
