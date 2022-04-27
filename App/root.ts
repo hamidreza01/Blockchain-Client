@@ -14,7 +14,7 @@ export default function (
   root
     .start()
     .then((value) => {
-      nodes.start(blockChain);
+      nodes.start();
       root.addMe();
     })
     .catch((err) => {
@@ -44,7 +44,6 @@ export default function (
 
   root.bet("newNode", (data: string) => {
     nodes.list.push(data);
-    console.log(nodes.list);
   });
 
   root.bet("giveMeData", () => {

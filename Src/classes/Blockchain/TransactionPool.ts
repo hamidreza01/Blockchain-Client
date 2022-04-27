@@ -21,9 +21,9 @@ export class TransactionPool implements _TransactionPool {
         this.transactionMap = {}
     }
     clearBlockchainTransactions(chain : Array<_Block>) : void {
-        for(let i = 0 ; i < chain.length ; i++){
+        for(let i = 1 ; i < chain.length ; i++){
             const block = chain[i];
-            for(let j = 0 ; j < block.data.transaction!.length ; j++){
+            for(let j = 1 ; j < block.data.transaction!.length ; j++){
                 const tx = block.data.transaction![j];
                 delete this.transactionMap[tx.id];
             }

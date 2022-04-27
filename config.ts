@@ -7,9 +7,9 @@ const ADMIN = {
 const REWARD_TRANSACTION  = {
   address : '**DPX Blockchain**'
 }
-const REWARD = 1;
+const REWARD = 10;
 export const config: {
-
+  NODE_PORT : number,
   MINE_RATE: number;
   ADMIN : {},
   GENESIS_DATA: _Block;
@@ -21,10 +21,11 @@ export const config: {
   };
   REWARD: number;
 } = {
+  NODE_PORT : 8765,
   ADMIN,
-  MINE_RATE: 1000,
+  MINE_RATE: 1000 * 60 * 10,
   ROOT_URL: "127.0.0.1",
-  ROOT_PORT: 3000,
+  ROOT_PORT: 3001,
   GENESIS_DATA: {
     hash: "DEFAULT-DPX-GENESIS-HASH",
     lastHash: "DEFAULT-DPX-LAST-HASH",

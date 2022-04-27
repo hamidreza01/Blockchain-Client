@@ -22,7 +22,7 @@ export class Root implements _Root {
   ];
   start(): Promise<_Errors | boolean> {
     this.client.on("data", (data: any) => {
-      console.dir(data.toString());
+      console.log(data.toString());
       try {
         data = JSON.parse(data.toString());
       } catch (error) {

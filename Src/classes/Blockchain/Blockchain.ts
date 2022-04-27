@@ -55,7 +55,7 @@ export class Blockchain implements _Blockchain {
     for (let i = 1; i < chain?.length; i++) {
       if (chain[i]?.data?.transaction?.length! < 1)
         return { message: "chain data is empty", code: 120 };
-      for (let transaction of chain[i].data.transaction!) {
+      for (let transaction of chain[i]?.data?.transaction!) {
         let rewardNumber = 0;
         if (
           transaction?.inputMap?.address === config.REWARD_TRANSACTION.address

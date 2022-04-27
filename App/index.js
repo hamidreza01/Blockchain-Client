@@ -8,175 +8,319 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
-var Blockchain_1 = require("../Src/classes/Blockchain/Blockchain");
-var Nodes_1 = require("../Src/classes/Network/Nodes");
-var Wallet_1 = require("../Src/classes/Blockchain/Wallet");
-var TransactionPool_1 = require("../Src/classes/Blockchain/TransactionPool");
-var TransactionMiner_1 = require("../Src/classes/Blockchain/TransactionMiner");
-var commander_1 = require("commander");
-var net_1 = require("net");
-var cluster_1 = __importDefault(require("cluster"));
-var root_1 = __importDefault(require("./root"));
-var nodes_1 = __importDefault(require("./nodes"));
-var sign_1 = require("../Src/Addon/sign");
-var blockChain;
-var port = Math.floor(Math.random() * 10000);
-var nodes = new Nodes_1.Nodes(port);
-var transactionPool = new TransactionPool_1.TransactionPool();
-var transactionMiner;
-blockChain = new Blockchain_1.Blockchain();
-var mainWallet = new Wallet_1.Wallet();
-transactionMiner = new TransactionMiner_1.TransactionMiner(transactionPool, blockChain, mainWallet, nodes);
-var cli = new commander_1.Command();
-var Wallets = [];
-var thisSocket;
-cli.version("1.0.0");
-cli
-    .command("start")
-    .description("start the node")
-    .option("-a, --api", "enable api response")
-    .action(function (option) {
-    (0, root_1["default"])(blockChain, nodes, transactionPool, port + 2);
-    (0, nodes_1["default"])(nodes, blockChain, transactionPool);
-    setTimeout(function () {
-        if (option.api) {
-            return thisSocket.write(JSON.stringify({
-                msg: {
-                    status: "started",
-                    mainWallet: {
-                        publicKey: mainWallet.publicKey,
-                        privateKey: mainWallet.privateKey
+Object.defineProperty(exports, "__esModule", { value: true });
+const Blockchain_1 = require("../Src/classes/Blockchain/Blockchain");
+const Nodes_1 = require("../Src/classes/Network/Nodes");
+const Wallet_1 = require("../Src/classes/Blockchain/Wallet");
+const TransactionPool_1 = require("../Src/classes/Blockchain/TransactionPool");
+const cluster_1 = __importDefault(require("cluster"));
+const root_1 = __importDefault(require("./root"));
+const nodes_1 = __importDefault(require("./nodes"));
+const config_1 = require("../config");
+const sign_1 = require("../Src/Addon/sign");
+const Transaction_1 = require("../Src/classes/Blockchain/Transaction");
+const fs_1 = __importDefault(require("fs"));
+const express_1 = __importDefault(require("express"));
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    console.log = () => { };
+    if (cluster_1.default.isPrimary) {
+        try {
+            process.stdout.write("Developix Blockchain is running...");
+            const app = (0, express_1.default)();
+            let blockchain;
+            let nodes;
+            let admin;
+            let transactionPool;
+            // let transactionMiner: _TransactionMiner;
+            let start = false;
+            let timer;
+            // --- node api
+            app.use((req, res, next) => {
+                if (req.connection.localAddress === req.connection.remoteAddress) {
+                    next();
+                }
+                else {
+                    res.status(403).send("forbidden");
+                }
+            });
+            app.use(express_1.default.json());
+            app.post("/start", (req, res) => {
+                try {
+                    blockchain = new Blockchain_1.Blockchain();
+                    nodes = new Nodes_1.Nodes(config_1.config.NODE_PORT);
+                    admin = new Wallet_1.Wallet();
+                    transactionPool = new TransactionPool_1.TransactionPool();
+                    if (fs_1.default.existsSync("./chain.log")) {
+                        blockchain.chain = JSON.parse(fs_1.default.readFileSync("./chain.log").toString());
+                    }
+                    setInterval(() => {
+                        fs_1.default.writeFileSync("./chain.log", JSON.stringify(blockchain.chain));
+                    }, 1000 * 60 * 60);
+                    (0, root_1.default)(blockchain, nodes, transactionPool, config_1.config.NODE_PORT + 2);
+                    (0, nodes_1.default)(nodes, blockchain, transactionPool, admin, cluster_1.default);
+                    start = true;
+                    res.status(200).json({
+                        message: "node started",
+                        status: true,
+                        mainWallet: {
+                            publicKey: admin.publicKey,
+                            privateKey: admin.privateKey,
+                        },
+                    });
+                }
+                catch (err) {
+                    if (err) {
+                        res.status(500).json({
+                            message: err.message,
+                            status: false,
+                        });
+                    }
+                    else {
+                        res.status(500).json({
+                            message: "unknown error",
+                            status: false,
+                        });
                     }
                 }
-            }));
-        }
-        thisSocket.write(JSON.stringify({
-            msg: "node has been started. \n your main Wallet publicKey is: ".concat(mainWallet.publicKey, " \n your main Wallet privateKey is: ").concat(mainWallet.privateKey)
-        }));
-    });
-});
-cli
-    .command("wallet")
-    .description("manage your node wallets")
-    .option("-a, --api", "enable api response")
-    .option("-c, --create", "create a wallet")
-    .option("-b, --balance <publicKey>", "balance of wallet with address")
-    .action(function (option) {
-    if (option.create) {
-        var wallet = new Wallet_1.Wallet();
-        if (option.api) {
-            return thisSocket.write(JSON.stringify({
-                msg: {
-                    status: "created",
-                    wallet: {
-                        publicKey: wallet.publicKey,
-                        privateKey: wallet.privateKey
+            });
+            app.post("/wallet/create", (req, res) => {
+                try {
+                    if (!start) {
+                        return res.status(400).json({
+                            message: "node not started",
+                            status: false,
+                        });
+                    }
+                    const wallet = new Wallet_1.Wallet();
+                    res.status(200).json({
+                        message: "wallet created",
+                        status: true,
+                        wallet: {
+                            publicKey: wallet.publicKey,
+                            privateKey: wallet.privateKey,
+                        },
+                    });
+                }
+                catch (err) {
+                    res.status(500).json({
+                        message: "wallet not created",
+                        status: false,
+                    });
+                }
+            });
+            app.post("/wallet/balance/:publicKey", (req, res) => {
+                try {
+                    if (!start) {
+                        return res.status(400).json({
+                            message: "node not started",
+                            status: false,
+                        });
+                    }
+                    const { publicKey } = req.params;
+                    const balance = Wallet_1.Wallet.calculateBalance(blockchain.chain, publicKey);
+                    res.status(200).json({
+                        message: "wallet balance",
+                        status: true,
+                        wallet: {
+                            publicKey,
+                            balance,
+                        },
+                    });
+                }
+                catch (err) {
+                    res.status(500).json({
+                        message: "wallet balance not found",
+                        status: false,
+                    });
+                }
+            });
+            app.post("/mine/stop", (req, res) => {
+                try {
+                    if (!start) {
+                        return res.status(400).json({
+                            message: "node not started",
+                            status: false,
+                        });
+                    }
+                    for (let i of cluster_1.default.workers) {
+                        i.send({ 'stop': true });
+                    }
+                    clearInterval(timer);
+                    res.status(200).json({
+                        message: "mining stopped",
+                        status: true,
+                    });
+                }
+                catch (err) {
+                    res.status(500).json({
+                        message: "error mining",
+                        status: false,
+                    });
+                }
+            });
+            app.post("/mine/start/:core", (req, res) => {
+                try {
+                    if (!start) {
+                        return res.status(400).json({
+                            message: "node not started",
+                            status: false,
+                        });
+                    }
+                    const { core } = req.params;
+                    res.status(200).json({
+                        message: "mining started",
+                        status: true,
+                    });
+                    for (let i = 0; i < core; i++) {
+                        let worker = cluster_1.default.fork();
+                        timer = setInterval(() => {
+                            worker.send({
+                                chain: blockchain.chain,
+                                transactions: [
+                                    Transaction_1.Transaction.reward(admin),
+                                    ...Object.values(transactionPool.transactionMap),
+                                ],
+                            });
+                        }, 1000);
+                        cluster_1.default.on("message", (worker, message, handle) => {
+                            if (message.chain) {
+                                if (blockchain.replaceChain(message.chain) === true) {
+                                    nodes.broadcast("chain", blockchain.chain);
+                                    transactionPool.clear();
+                                }
+                            }
+                        });
                     }
                 }
-            }));
+                catch (err) {
+                    res.status(500).json({
+                        message: "error mining",
+                        status: false,
+                    });
+                }
+            });
+            app.post("/transaction", (req, res) => {
+                var _a, _b;
+                try {
+                    if (!start) {
+                        return res.status(400).json({
+                            message: "node not started",
+                            status: false,
+                        });
+                    }
+                    const { fromPublicKey, fromPrivateKey, toPublicKey, amount } = req.body;
+                    const wallet = new Wallet_1.Wallet();
+                    wallet.keyPair = (0, sign_1.recoveryKeyPair)(fromPrivateKey, fromPublicKey);
+                    wallet.privateKey = fromPrivateKey;
+                    wallet.publicKey = fromPublicKey;
+                    let hasTransaction = transactionPool.isHave(wallet);
+                    if (hasTransaction) {
+                        hasTransaction.update(toPublicKey, amount, wallet);
+                        return res.status(200).json({
+                            message: "transaction updated",
+                            status: true,
+                            hasTransaction,
+                        });
+                    }
+                    let transaction = wallet.createTransaction(toPublicKey, amount, blockchain.chain);
+                    if (transaction.code) {
+                        return res.status(transaction.code).json({
+                            message: transaction.message,
+                            status: false,
+                        });
+                    }
+                    (_b = (_a = cluster_1.default.workers) === null || _a === void 0 ? void 0 : _a.values) === null || _b === void 0 ? void 0 : _b.send({
+                        chain: blockchain.chain,
+                        transactions: [
+                            Transaction_1.Transaction.reward(admin),
+                            ...Object.values(transactionPool.transactionMap),
+                        ],
+                    });
+                    res.status(200).json({
+                        message: "transaction created",
+                        status: true,
+                        transaction,
+                    });
+                }
+                catch (err) {
+                    res.status(500).json({
+                        message: "transaction not created",
+                        status: false,
+                    });
+                }
+            });
+            app.post("/chain/log", (req, res) => {
+                try {
+                    if (!start) {
+                        return res.status(400).json({
+                            message: "node not started",
+                            status: false,
+                        });
+                    }
+                    const { location } = req.body;
+                    if (fs_1.default.existsSync(location)) {
+                        fs_1.default.unlinkSync(location);
+                        fs_1.default.writeFileSync(location, JSON.stringify(blockchain.chain));
+                    }
+                    else {
+                        fs_1.default.writeFileSync(location, JSON.stringify(blockchain.chain));
+                    }
+                    res.status(200).json({
+                        message: "chain loged",
+                        status: true,
+                        location,
+                    });
+                }
+                catch (err) {
+                    res.status(500).json({
+                        message: "chain log not saved",
+                        status: false,
+                    });
+                }
+            });
+            app.post("/chain/restart", (req, res) => {
+                try {
+                    if (!start) {
+                        return res.status(400).json({
+                            message: "node not started",
+                            status: false,
+                        });
+                    }
+                    blockchain = new Blockchain_1.Blockchain();
+                    transactionPool.clear();
+                    res.status(200).json({
+                        message: "chain restarted",
+                        status: true,
+                    });
+                }
+                catch (error) {
+                    res.status(500).json({
+                        message: "chain not restarted",
+                        status: false,
+                    });
+                }
+            });
+            app.listen(7612, () => {
+                console.log("node api run in port 7612");
+            });
         }
-        console.log("wallet created with publicKey: ".concat(wallet.publicKey, "\n and privateKey: ").concat(wallet.privateKey));
-    }
-    if (option.balance) {
-        Wallet_1.Wallet.calculateBalance(blockChain.chain, option.balance);
-    }
-});
-cli
-    .command("mine")
-    .description("start mining")
-    .option("-a, --api", "enable api response")
-    .option("-c, --core <number>", "select cpu core for mining")
-    .action(function (option) {
-    option.core = option.core ? option.core : 0;
-    if (cluster_1["default"].isPrimary) {
-        for (var i = 0; i < option.core; i++) {
-            cluster_1["default"].fork();
+        catch (error) {
+            console.error(error);
         }
     }
     else {
-        var starter_1 = function () { return __awaiter(void 0, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                transactionMiner.mineTransaction().then(function () {
-                    console.dir("mine block in ".concat(Date.now()));
-                    starter_1();
-                });
-                return [2 /*return*/];
-            });
-        }); };
-        starter_1();
-    }
-    if (option.api) {
-        return console.log(JSON.stringify({ status: "started", miner: process.pid }));
-    }
-    console.log("mining started in " + process.pid);
-});
-cli
-    .command("transaction")
-    .description("manage your node transactions")
-    .option("-a, --api", "enable api response")
-    .option("-fpub,--fromPublic <publicKey>", "from public address")
-    .option("-fpri,--fromPrivate <privateKey>", "from private address")
-    .option("-tpub,--toPublic <publicKey>", "to public address")
-    .option("-v,--value <number>", "Transfer Value")
-    .action(function (option) {
-    if (option.fromPublic &&
-        option.fromPrivate &&
-        option.value &&
-        option.toPublic) {
-        var wallet = new Wallet_1.Wallet();
-        wallet.keyPair = (0, sign_1.recoveryKeyPair)(option.fromPrivate, option.fromPublic);
-        wallet.privateKey = option.fromPrivate;
-        wallet.publicKey = option.fromPublic;
-        var add = wallet.createTransaction(option.toPublic, option.value, blockChain.chain);
-        if (add === null || add === void 0 ? void 0 : add.code) {
-            if (option.api) {
-                return console.log(add);
+        process.on("message", (data) => {
+            if (data.stop) {
+                return process.exit(0);
             }
-            return console.log(add === null || add === void 0 ? void 0 : add.message);
-        }
-        transactionPool.add(add);
-        if (option.api) {
-            return console.log(JSON.stringify(""));
-        }
+            let blockchain = new Blockchain_1.Blockchain();
+            blockchain.chain = data.chain;
+            let transactions = data.transactions;
+            blockchain.addBlock({ transaction: transactions });
+            process.send({ chain: blockchain.chain });
+        });
     }
-});
-var server = (0, net_1.createServer)();
-server.on("connection", function (socket) {
-    thisSocket = socket;
-    socket.on("data", function (data) {
-        data = data.toString();
-        thisSocket = socket;
-        cli.parse(data);
-    });
-});
+}))();

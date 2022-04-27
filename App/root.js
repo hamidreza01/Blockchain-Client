@@ -1,38 +1,38 @@
 "use strict";
-exports.__esModule = true;
-var Root_1 = require("../Src/classes/Network/Root");
+Object.defineProperty(exports, "__esModule", { value: true });
+const Root_1 = require("../Src/classes/Network/Root");
 function default_1(blockChain, nodes, transactionPool, port) {
-    var root = new Root_1.Root(port);
+    const root = new Root_1.Root(port);
     root
         .start()
-        .then(function (value) {
-        nodes.start(blockChain);
+        .then((value) => {
+        nodes.start();
         root.addMe();
-    })["catch"](function (err) {
+    })
+        .catch((err) => {
         console.log(err);
     });
-    root.bet("welcome", function (data) {
+    root.bet("welcome", (data) => {
         nodes.list = data.nodeList;
         blockChain.chain = data.chain;
         transactionPool.transactionMap = data.transactionMap;
     });
-    root.bet("sliceChain", function (data) {
-        blockChain.chain = blockChain.chain.filter(function (x, i) {
+    root.bet("sliceChain", (data) => {
+        blockChain.chain = blockChain.chain.filter((x, i) => {
             return i < data;
         });
     });
-    root.bet("reaplceChain", function (data) {
+    root.bet("reaplceChain", (data) => {
         blockChain.chain = data;
     });
-    root.bet("replaceNodes", function (data) {
+    root.bet("replaceNodes", (data) => {
         nodes.list = data;
     });
-    root.bet("newNode", function (data) {
+    root.bet("newNode", (data) => {
         nodes.list.push(data);
-        console.log(nodes.list);
     });
-    root.bet("giveMeData", function () {
+    root.bet("giveMeData", () => {
         root.giveData(blockChain.chain, nodes.list);
     });
 }
-exports["default"] = default_1;
+exports.default = default_1;

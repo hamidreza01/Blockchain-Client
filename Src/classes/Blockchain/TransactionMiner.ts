@@ -6,6 +6,9 @@ import { Transaction } from "./Transaction";
 import { _TransactionPool } from "../../interfaces/Blockchain/_TransactionPool";
 import { _Transaction } from "../../interfaces/Blockchain/_Transaction";
 import { _TransactionMiner } from "../../interfaces/Blockchain/_TransactionMiner";
+
+// ** This class is only offered for small projects  ** // 
+
 export class TransactionMiner implements _TransactionMiner{
     constructor(private transactionPool : _TransactionPool, private blockchain : _Blockchain, private wallet : _Wallet, private nodes : _Nodes ){
     }

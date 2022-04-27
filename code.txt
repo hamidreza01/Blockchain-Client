@@ -1,0 +1,22 @@
+- code list 
+
+-- 100-199 - validation 
+
+--- 101 - chain is short 
+--- 102 - chain is invalid
+--- 111 - invalid transaction
+--- 112 - amount exceeds balance
+--- 120 - chain data is empty
+--- 121 - reward transaction is invalid
+--- 122 - reward transaction length is invalid
+--- 123 - transaction amount is invalid
+
+-- 200-299 - connection
+
+--- 200 - success 
+--- 250 - error connecting to the root server
+--- 251 - connect to the root server of timeout
+
+-- 500-599 - server 
+
+--- 500 - server error

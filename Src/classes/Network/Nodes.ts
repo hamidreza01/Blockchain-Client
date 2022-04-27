@@ -6,23 +6,11 @@ import { _Nodes } from "../../interfaces/Network/_Nodes";
 export class Nodes implements _Nodes {
   list: Array<string> = [""];
   private app = express();
-  private classData = [];
   private blockChain: any;
   constructor(private port: number) {}
-  start(blockChain: _Blockchain): void {
-    this.blockChain = blockChain;
+  start(): void {
     this.app.use(express.json());
-    this.app.post("/addBlock", (req, res) => {
-      this.blockChain.addBlock(['test']);
-      this.broadcast("chain", this.blockChain.chain);
-      res.send(this.blockChain.chian);
-    });
-    this.app.post("/blocks", (req, res) => {
-      res.send(this.blockChain.chain);
-    });
-    this.app.listen(this.port, () => {
-      console.log("Api run in", this.port);
-    });
+    this.app.listen(this.port);
   }
   async broadcast(name: string, data: any): Promise<void> {
     for (let i = 0; i < this.list.length; i++) {

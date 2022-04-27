@@ -2,39 +2,39 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Transaction = void 0;
-var uniqid_1 = __importDefault(require("uniqid"));
-var sign_1 = require("../../Addon/sign");
-var config_1 = require("../../../config");
-var Transaction = /** @class */ (function () {
-    function Transaction(senderWallet, amount, recpient, inputMap, outputMap) {
-        this.id = (0, uniqid_1["default"])();
+const uniqid_1 = __importDefault(require("uniqid"));
+const sign_1 = require("../../Addon/sign");
+const config_1 = require("../../../config");
+class Transaction {
+    constructor(senderWallet, amount, recpient, inputMap, outputMap) {
+        this.id = (0, uniqid_1.default)();
         this.outputMap = {};
         this.inputMap = {
             timestamp: 0,
             address: "",
             amount: 0,
-            signature: { s: "", r: "" }
+            signature: { s: "", r: "" },
         };
         (this.outputMap = outputMap || this.outputMapCreator(senderWallet, amount, recpient)),
             (this.inputMap = inputMap || this.inputMapCreator(senderWallet, this.outputMap));
     }
-    Transaction.prototype.inputMapCreator = function (senderWallet, outputMap) {
+    inputMapCreator(senderWallet, outputMap) {
         return {
             timestamp: Date.now(),
             address: senderWallet.publicKey,
             amount: senderWallet.balance,
-            signature: senderWallet.sign(outputMap)
+            signature: senderWallet.sign(outputMap),
         };
-    };
-    Transaction.prototype.outputMapCreator = function (senderWallet, amount, recipient) {
-        var outputMap = {};
+    }
+    outputMapCreator(senderWallet, amount, recipient) {
+        let outputMap = {};
         outputMap[senderWallet.publicKey] = senderWallet.balance - amount;
         outputMap[recipient] = amount;
         return outputMap;
-    };
-    Transaction.prototype.update = function (recpient, amount, senderWallet) {
+    }
+    update(recpient, amount, senderWallet) {
         if (this.outputMap[senderWallet.publicKey] < amount) {
             return { message: "amount exceeds balance", code: 112 };
         }
@@ -45,29 +45,27 @@ var Transaction = /** @class */ (function () {
             this.outputMap[recpient] = amount;
         }
         this.inputMap = this.inputMapCreator(senderWallet, this.outputMap);
-    };
-    Transaction.isValid = function (transaction) {
-        var total = Object.values(transaction.outputMap).reduce(function (all, val) {
+    }
+    static isValid(transaction) {
+        let total = Object.values(transaction.outputMap).reduce((all, val) => {
             return all + val;
         });
         if (total !== transaction.inputMap.amount) {
             return {
-                message: "invalid transaction from ".concat(transaction.inputMap.address),
-                code: 111
+                message: `invalid transaction from ${transaction.inputMap.address}`,
+                code: 111,
             };
         }
         if (!(0, sign_1.verify)(transaction.outputMap, transaction.inputMap.signature, transaction.inputMap.address)) {
             return {
-                message: "invalid transaction from ".concat(transaction.inputMap.address),
-                code: 112
+                message: `invalid transaction from ${transaction.inputMap.address}`,
+                code: 112,
             };
         }
         return true;
-    };
-    Transaction.reward = function (minerWallet) {
-        var _a;
-        return new Transaction(minerWallet, 0, minerWallet.publicKey, config_1.config.REWARD_TRANSACTION, (_a = {}, _a[minerWallet.publicKey] = config_1.config.REWARD, _a));
-    };
-    return Transaction;
-}());
+    }
+    static reward(minerWallet) {
+        return new Transaction(minerWallet, 0, minerWallet.publicKey, config_1.config.REWARD_TRANSACTION, { [minerWallet.publicKey]: config_1.config.REWARD });
+    }
+}
 exports.Transaction = Transaction;
