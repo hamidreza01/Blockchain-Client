@@ -16,6 +16,8 @@ const Blockchain_1 = require("../Src/classes/Blockchain/Blockchain");
 const Nodes_1 = require("../Src/classes/Network/Nodes");
 const Wallet_1 = require("../Src/classes/Blockchain/Wallet");
 const TransactionPool_1 = require("../Src/classes/Blockchain/TransactionPool");
+// import { _TransactionMiner } from "../Src/interfaces/Blockchain/_TransactionMiner";
+// import { TransactionMiner } from "../Src/classes/Blockchain/TransactionMiner";
 const cluster_1 = __importDefault(require("cluster"));
 const root_1 = __importDefault(require("./root"));
 const nodes_1 = __importDefault(require("./nodes"));
@@ -138,6 +140,7 @@ const express_1 = __importDefault(require("express"));
                 }
             });
             app.post("/mine/stop", (req, res) => {
+                var _a;
                 try {
                     if (!start) {
                         return res.status(400).json({
@@ -145,8 +148,8 @@ const express_1 = __importDefault(require("express"));
                             status: false,
                         });
                     }
-                    for (let i of cluster_1.default.workers) {
-                        i.send({ 'stop': true });
+                    for (let j = 0; j < Object.keys(cluster_1.default === null || cluster_1.default === void 0 ? void 0 : cluster_1.default.workers).length; j++) {
+                        (_a = cluster_1.default.workers[j]) === null || _a === void 0 ? void 0 : _a.kill();
                     }
                     clearInterval(timer);
                     res.status(200).json({
@@ -177,13 +180,16 @@ const express_1 = __importDefault(require("express"));
                     for (let i = 0; i < core; i++) {
                         let worker = cluster_1.default.fork();
                         timer = setInterval(() => {
-                            worker.send({
-                                chain: blockchain.chain,
-                                transactions: [
-                                    Transaction_1.Transaction.reward(admin),
-                                    ...Object.values(transactionPool.transactionMap),
-                                ],
-                            });
+                            var _a;
+                            for (let j = 0; j < Object.keys(cluster_1.default === null || cluster_1.default === void 0 ? void 0 : cluster_1.default.workers).length; j++) {
+                                (_a = cluster_1.default.workers[j]) === null || _a === void 0 ? void 0 : _a.send({
+                                    chain: blockchain.chain,
+                                    transactions: [
+                                        Transaction_1.Transaction.reward(admin),
+                                        ...Object.values(transactionPool.transactionMap),
+                                    ],
+                                });
+                            }
                         }, 1000);
                         cluster_1.default.on("message", (worker, message, handle) => {
                             if (message.chain) {
@@ -313,9 +319,6 @@ const express_1 = __importDefault(require("express"));
     }
     else {
         process.on("message", (data) => {
-            if (data.stop) {
-                return process.exit(0);
-            }
             let blockchain = new Blockchain_1.Blockchain();
             blockchain.chain = data.chain;
             let transactions = data.transactions;

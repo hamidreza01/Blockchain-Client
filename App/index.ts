@@ -18,9 +18,9 @@ import { _TransactionPool } from "../Src/interfaces/Blockchain/_TransactionPool"
 
 import { _Transaction } from "../Src/interfaces/Blockchain/_Transaction";
 
-import { _TransactionMiner } from "../Src/interfaces/Blockchain/_TransactionMiner";
+// import { _TransactionMiner } from "../Src/interfaces/Blockchain/_TransactionMiner";
 
-import { TransactionMiner } from "../Src/classes/Blockchain/TransactionMiner";
+// import { TransactionMiner } from "../Src/classes/Blockchain/TransactionMiner";
 
 import cluster from "cluster";
 
@@ -162,17 +162,15 @@ import express from "express";
 
       app.post("/mine/stop", (req, res) => {
         try {
-
           if (!start) {
             return res.status(400).json({
               message: "node not started",
               status: false,
             });
           }
-          for (let i of cluster.workers as any) {
-            i.kill(0);
+          for (let j = 0; j < Object.keys(cluster?.workers!).length; j++) {
+            cluster.workers![j]?.kill();
           }
-
           clearInterval(timer);
           res.status(200).json({
             message: "mining stopped",
@@ -202,13 +200,15 @@ import express from "express";
           for (let i = 0; i < core; i++) {
             let worker = cluster.fork();
             timer = setInterval(() => {
-              worker.send({
-                chain: blockchain.chain,
-                transactions: [
-                  Transaction.reward(admin),
-                  ...Object.values(transactionPool.transactionMap),
-                ],
-              });
+              for (let j = 0; j < Object.keys(cluster?.workers!).length; j++) {
+                cluster.workers![j]?.send({
+                  chain: blockchain.chain,
+                  transactions: [
+                    Transaction.reward(admin),
+                    ...Object.values(transactionPool.transactionMap),
+                  ],
+                });
+              }
             }, 1000);
             cluster.on("message", (worker, message, handle) => {
               if (message.chain) {
