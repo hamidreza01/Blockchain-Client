@@ -18,10 +18,6 @@ import { _TransactionPool } from "../Src/interfaces/Blockchain/_TransactionPool"
 
 import { _Transaction } from "../Src/interfaces/Blockchain/_Transaction";
 
-// import { _TransactionMiner } from "../Src/interfaces/Blockchain/_TransactionMiner";
-
-// import { TransactionMiner } from "../Src/classes/Blockchain/TransactionMiner";
-
 import cluster from "cluster";
 
 import rootFunction from "./root";
@@ -41,7 +37,7 @@ import fs from "fs";
 import express from "express";
 
 (async () => {
-  console.log = () => {};
+  // console.log = () => {};
   if (cluster.isPrimary) {
     try {
       process.stdout.write("Developix Blockchain is running...");
@@ -49,10 +45,10 @@ import express from "express";
       let blockchain: _Blockchain;
       let nodes: _Nodes;
       let admin: _Wallet;
+      // let workers: any[] = [];
       let transactionPool: _TransactionPool;
       // let transactionMiner: _TransactionMiner;
       let start = false;
-      let timer: any;
       // --- node api
       app.use((req, res, next) => {
         if (req.connection.localAddress === req.connection.remoteAddress) {
@@ -168,10 +164,9 @@ import express from "express";
               status: false,
             });
           }
-          for (let j = 0; j < Object.keys(cluster?.workers!).length; j++) {
-            cluster.workers![j]?.kill();
+          for (const worker of Object.values(cluster.workers!)) {
+            worker?.kill();
           }
-          clearInterval(timer);
           res.status(200).json({
             message: "mining stopped",
             status: true,
@@ -199,22 +194,26 @@ import express from "express";
           });
           for (let i = 0; i < core; i++) {
             let worker = cluster.fork();
-            timer = setInterval(() => {
-              for (let j = 0; j < Object.keys(cluster?.workers!).length; j++) {
-                cluster.workers![j]?.send({
-                  chain: blockchain.chain,
-                  transactions: [
-                    Transaction.reward(admin),
-                    ...Object.values(transactionPool.transactionMap),
-                  ],
-                });
-              }
-            }, 1000);
-            cluster.on("message", (worker, message, handle) => {
+            worker?.send({
+              chain: blockchain.chain,
+              transactions: [
+                Transaction.reward(admin),
+                ...Object.values(transactionPool.transactionMap),
+              ],
+            });
+            worker.on("error", () => {});
+            cluster.on("message", async (worker, message, handle) => {
               if (message.chain) {
                 if (blockchain.replaceChain(message.chain) === true) {
-                  nodes.broadcast("chain", blockchain.chain);
+                  await nodes.broadcast("chain", blockchain.chain);
                   transactionPool.clear();
+                  worker?.send({
+                    chain: blockchain.chain,
+                    transactions: [
+                      Transaction.reward(admin),
+                      ...Object.values(transactionPool.transactionMap),
+                    ],
+                  });
                 }
               }
             });
@@ -235,16 +234,26 @@ import express from "express";
               status: false,
             });
           }
-          const { fromPublicKey, fromPrivateKey, toPublicKey, amount }: any =
+
+          const { fromPublicKey, fromPrivateKey, toPublic, amount }: any =
             req.body;
+
           const wallet = new Wallet();
+
           wallet.keyPair = recoveryKeyPair(fromPrivateKey, fromPublicKey);
           wallet.privateKey = fromPrivateKey;
           wallet.publicKey = fromPublicKey;
-          let hasTransaction = transactionPool.isHave(wallet);
 
+          let hasTransaction: any = transactionPool.isHave(wallet);
+          console.log(hasTransaction == true);
           if (hasTransaction) {
-            hasTransaction.update(toPublicKey, amount, wallet);
+            hasTransaction = hasTransaction.update(toPublic, amount, wallet);
+            if (hasTransaction?.code) {
+              return res.status(hasTransaction.code).json({
+                message: hasTransaction.message,
+                status: false,
+              });
+            }
             return res.status(200).json({
               message: "transaction updated",
               status: true,
@@ -253,29 +262,26 @@ import express from "express";
           }
 
           let transaction = wallet.createTransaction(
-            toPublicKey,
-            amount,
+            toPublic,
+            Number(amount),
             blockchain.chain
           );
-          if ((transaction as _Errors).code) {
+
+          if ((transaction as _Errors)?.code) {
             return res.status((transaction as _Errors).code).json({
               message: (transaction as _Errors).message,
               status: false,
             });
           }
-          cluster.workers?.values?.send({
-            chain: blockchain.chain,
-            transactions: [
-              Transaction.reward(admin),
-              ...Object.values(transactionPool.transactionMap),
-            ],
-          });
+          transactionPool.add(transaction as _Transaction);
+          nodes.broadcast("transaction", transaction);
           res.status(200).json({
             message: "transaction created",
             status: true,
             transaction,
           });
         } catch (err) {
+          console.dir(err, { depth: null });
           res.status(500).json({
             message: "transaction not created",
             status: false,
@@ -310,6 +316,9 @@ import express from "express";
           });
         }
       });
+      app.get("/pool", (req, res) => {
+        res.json(transactionPool.transactionMap);
+      });
 
       app.post("/chain/restart", (req, res) => {
         try {
@@ -341,6 +350,9 @@ import express from "express";
     }
   } else {
     process.on("message", (data: any) => {
+      // if(data === 'stop'){
+      //   return process.exit(0);
+      // }
       let blockchain = new Blockchain();
       blockchain.chain = data.chain;
       let transactions: [_Transaction] = data.transactions;

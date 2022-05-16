@@ -27,15 +27,18 @@ class Nodes {
     }
     broadcast(name, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            for (let i = 0; i < this.list.length; i++) {
-                try {
-                    yield axios_1.default.post(`http://${this.list[i]}/${name}`, data);
-                    console.log(`success send ${this.list[i]} with ${name} channel`);
+            return new Promise((res) => __awaiter(this, void 0, void 0, function* () {
+                for (let i = 0; i < this.list.length; i++) {
+                    try {
+                        yield axios_1.default.post(`http://${this.list[i]}/${name}`, data);
+                        console.log(`success send ${this.list[i]} with ${name} channel`);
+                    }
+                    catch (error) {
+                        console.log(`Error brodcast to ${this.list[i]} with ${name} channel`);
+                    }
                 }
-                catch (error) {
-                    console.log(`Error brodcast to ${this.list[i]} with ${name} channel`);
-                }
-            }
+                res;
+            }));
         });
     }
     bet(name, callback) {

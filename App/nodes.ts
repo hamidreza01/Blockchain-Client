@@ -15,6 +15,7 @@ export default function (
 ) {
 
   nodes.bet("chain", (data: Array<_Block>) => {
+    console.log('recived chain : \n',data)
     if(blockchain.validTransactionData(data) === true && blockchain.replaceChain(data) === true) {
       transactionPool.clearBlockchainTransactions(data);
     };
@@ -26,10 +27,6 @@ export default function (
       return;
     }
     transactionPool.add(data);
-    cluster.workers?.values?.send({
-      chain: blockchain.chain,
-      transactions : [Transaction.reward(admin),...Object.values(transactionPool.transactionMap)]
-    });
   });
   
 

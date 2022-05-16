@@ -45,8 +45,8 @@ cli
           if (option.api) {
             return console.log(JSON.stringify(res.data));
           }
-          if (!res.data.status) {
-            return console.log(res.data.message);
+          else if(!res.data.status){
+            return console.log(`${line} ${color.bright.green(res.data.message)}${line}`);
           }
           return console.log(
             `${line} ${color.bright.green("chain restarted")}\n${line}`
@@ -62,8 +62,8 @@ cli
           if (option.api) {
             return console.log(JSON.stringify(res.data));
           }
-          if (!res.data.status) {
-            return console.log(res.data.message);
+          else if(!res.data.status){
+            return console.log(`${line} ${color.bright.green(res.data.message)}${line}`);
           }
           console.log(
             `${line} ${color.bright.green(
@@ -89,8 +89,8 @@ cli
           if (option.api) {
             return console.log(JSON.stringify(res.data));
           }
-          if (!res.data.status) {
-            return console.log(res.data.message);
+          else if(!res.data.status){
+            return console.log(`${line} ${color.bright.green(res.data.message)}${line}`);
           }
           console.log(
             `${line} ${color.bright.green(
@@ -110,8 +110,8 @@ cli
           if (option.api) {
             return console.log(JSON.stringify(res.data));
           }
-          if (!res.data.status) {
-            return console.log(res.data.message);
+          else if(!res.data.status){
+            return console.log(`${line} ${color.bright.green(res.data.message)}${line}`);
           }
           console.log(
             `${line} ${color.bright.green(
@@ -134,17 +134,15 @@ cli
       axios
         .post("http://127.0.0.1:7612/mine/stop")
         .then((res) => {
-          console.log(res);
           if (option.api) {
             return console.log(JSON.stringify(res.data));
           }
-          if (!res.data.status) {
-            return console.log(res.data.message);
+          else if(!res.data.status){
+            return console.log(`${line} ${color.bright.green(res.data.message)}${line}`);
           }
           console.log(`${line} ${color.bright.green("mining stopped")}${line}`);
         })
         .catch((err) => {
-          console.log(err);
         });
     } else if (option.core) {
       axios
@@ -185,8 +183,9 @@ cli
       option.value
     ) {
       axios
-        .post("http://127.0.0.1:7612/transaction/create", {
+        .post("http://127.0.0.1:7612/transaction", {
           fromPublicKey: option.fromPublic,
+          fromPrivateKey : option.fromPrivate, 
           toPublic: option.toPublic,
           amount: option.value,
         })
@@ -194,9 +193,12 @@ cli
           if (option.api) {
             return console.log(JSON.stringify(res.data));
           }
-          console.log(res.data);
+          else if(!res.data.status){
+            return console.log(`${line} ${color.bright.green(res.data.message)}${line}`);
+          }
+          console.log(`${line} ${color.bright.green("transaction created")}${line}`);
         })
-        .catch(() => {});
+        .catch((err) => {console.log(err)});
     }
   });
 

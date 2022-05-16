@@ -13,19 +13,22 @@ export class Nodes implements _Nodes {
     this.app.listen(this.port);
   }
   async broadcast(name: string, data: any): Promise<void> {
-    for (let i = 0; i < this.list.length; i++) {
-      try {
-        await axios.post(`http://${this.list[i]}/${name}`, data);
-        console.log(`success send ${this.list[i]} with ${name} channel`);
-      } catch (error) {
-        console.log(`Error brodcast to ${this.list[i]} with ${name} channel`);
+    return new Promise(async (res) => {
+      for (let i = 0; i < this.list.length; i++) {
+        try {
+          await axios.post(`http://${this.list[i]}/${name}`, data);
+          console.log(`success send ${this.list[i]} with ${name} channel`);
+        } catch (error) {
+          console.log(`Error brodcast to ${this.list[i]} with ${name} channel`);
+        }
       }
-    }
+      res;
+    });
   }
   bet(name: string, callback: Function): void {
     this.app.use(express.json());
     this.app.post("/" + name, (req, res) => {
-      callback(req.body)
+      callback(req.body);
       res.send("ok");
     });
   }

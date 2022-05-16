@@ -39,8 +39,8 @@ cli
             if (option.api) {
                 return console.log(JSON.stringify(res.data));
             }
-            if (!res.data.status) {
-                return console.log(res.data.message);
+            else if (!res.data.status) {
+                return console.log(`${line} ${ansicolor_1.default.bright.green(res.data.message)}${line}`);
             }
             return console.log(`${line} ${ansicolor_1.default.bright.green("chain restarted")}\n${line}`);
         })
@@ -55,8 +55,8 @@ cli
             if (option.api) {
                 return console.log(JSON.stringify(res.data));
             }
-            if (!res.data.status) {
-                return console.log(res.data.message);
+            else if (!res.data.status) {
+                return console.log(`${line} ${ansicolor_1.default.bright.green(res.data.message)}${line}`);
             }
             console.log(`${line} ${ansicolor_1.default.bright.green("chain log saved")}\n  Location : ${ansicolor_1.default.blue(process.cwd() + "/chain.log")}${line}`);
         })
@@ -77,8 +77,8 @@ cli
             if (option.api) {
                 return console.log(JSON.stringify(res.data));
             }
-            if (!res.data.status) {
-                return console.log(res.data.message);
+            else if (!res.data.status) {
+                return console.log(`${line} ${ansicolor_1.default.bright.green(res.data.message)}${line}`);
             }
             console.log(`${line} ${ansicolor_1.default.bright.green("wallet created")}\n  Wallet :\n   Public Key : ${ansicolor_1.default.blue(res.data.wallet.publicKey)}\n   Private Key : ${ansicolor_1.default.red(res.data.wallet.privateKey)}${line}`);
         })
@@ -91,8 +91,8 @@ cli
             if (option.api) {
                 return console.log(JSON.stringify(res.data));
             }
-            if (!res.data.status) {
-                return console.log(res.data.message);
+            else if (!res.data.status) {
+                return console.log(`${line} ${ansicolor_1.default.bright.green(res.data.message)}${line}`);
             }
             console.log(`${line} ${ansicolor_1.default.bright.green("wallet balance")}\n  Balance : ${ansicolor_1.default.blue(res.data.wallet.balance)}${line}`);
         })
@@ -110,17 +110,15 @@ cli
         axios_1.default
             .post("http://127.0.0.1:7612/mine/stop")
             .then((res) => {
-            console.log(res);
             if (option.api) {
                 return console.log(JSON.stringify(res.data));
             }
-            if (!res.data.status) {
-                return console.log(res.data.message);
+            else if (!res.data.status) {
+                return console.log(`${line} ${ansicolor_1.default.bright.green(res.data.message)}${line}`);
             }
             console.log(`${line} ${ansicolor_1.default.bright.green("mining stopped")}${line}`);
         })
             .catch((err) => {
-            console.log(err);
         });
     }
     else if (option.core) {
@@ -160,8 +158,9 @@ cli
         option.fromPrivate &&
         option.value) {
         axios_1.default
-            .post("http://127.0.0.1:7612/transaction/create", {
+            .post("http://127.0.0.1:7612/transaction", {
             fromPublicKey: option.fromPublic,
+            fromPrivateKey: option.fromPrivate,
             toPublic: option.toPublic,
             amount: option.value,
         })
@@ -169,9 +168,12 @@ cli
             if (option.api) {
                 return console.log(JSON.stringify(res.data));
             }
-            console.log(res.data);
+            else if (!res.data.status) {
+                return console.log(`${line} ${ansicolor_1.default.bright.green(res.data.message)}${line}`);
+            }
+            console.log(`${line} ${ansicolor_1.default.bright.green("transaction created")}${line}`);
         })
-            .catch(() => { });
+            .catch((err) => { console.log(err); });
     }
 });
 cli.parse(process.argv);

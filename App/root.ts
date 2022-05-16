@@ -7,13 +7,13 @@ import { _TransactionPool } from "../Src/interfaces/Blockchain/_TransactionPool"
 export default function (
   blockChain: _Blockchain,
   nodes: _Nodes,
-  transactionPool : _TransactionPool,
-  port: number,
+  transactionPool: _TransactionPool,
+  port: number
 ): void {
   const root: _Root = new Root(port);
   root
     .start()
-    .then((value) => {
+    .then(() => {
       nodes.start();
       root.addMe();
     })
@@ -21,12 +21,11 @@ export default function (
       console.log(err);
     });
 
-  root.bet("welcome", (data : any) => {
+  root.bet("welcome", (data: any) => {
     nodes.list = data.nodeList;
     blockChain.chain = data.chain;
-    transactionPool.transactionMap = data.transactionMap;    
+    transactionPool.transactionMap = data.transactionMap;
   });
-
 
   root.bet("sliceChain", (data: number) => {
     blockChain.chain = blockChain.chain.filter((x, i) => {

@@ -16,8 +16,6 @@ const Blockchain_1 = require("../Src/classes/Blockchain/Blockchain");
 const Nodes_1 = require("../Src/classes/Network/Nodes");
 const Wallet_1 = require("../Src/classes/Blockchain/Wallet");
 const TransactionPool_1 = require("../Src/classes/Blockchain/TransactionPool");
-// import { _TransactionMiner } from "../Src/interfaces/Blockchain/_TransactionMiner";
-// import { TransactionMiner } from "../Src/classes/Blockchain/TransactionMiner";
 const cluster_1 = __importDefault(require("cluster"));
 const root_1 = __importDefault(require("./root"));
 const nodes_1 = __importDefault(require("./nodes"));
@@ -27,7 +25,7 @@ const Transaction_1 = require("../Src/classes/Blockchain/Transaction");
 const fs_1 = __importDefault(require("fs"));
 const express_1 = __importDefault(require("express"));
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    console.log = () => { };
+    // console.log = () => {};
     if (cluster_1.default.isPrimary) {
         try {
             process.stdout.write("Developix Blockchain is running...");
@@ -35,10 +33,10 @@ const express_1 = __importDefault(require("express"));
             let blockchain;
             let nodes;
             let admin;
+            // let workers: any[] = [];
             let transactionPool;
             // let transactionMiner: _TransactionMiner;
             let start = false;
-            let timer;
             // --- node api
             app.use((req, res, next) => {
                 if (req.connection.localAddress === req.connection.remoteAddress) {
@@ -140,7 +138,6 @@ const express_1 = __importDefault(require("express"));
                 }
             });
             app.post("/mine/stop", (req, res) => {
-                var _a;
                 try {
                     if (!start) {
                         return res.status(400).json({
@@ -148,10 +145,9 @@ const express_1 = __importDefault(require("express"));
                             status: false,
                         });
                     }
-                    for (let j = 0; j < Object.keys(cluster_1.default === null || cluster_1.default === void 0 ? void 0 : cluster_1.default.workers).length; j++) {
-                        (_a = cluster_1.default.workers[j]) === null || _a === void 0 ? void 0 : _a.kill();
+                    for (const worker of Object.values(cluster_1.default.workers)) {
+                        worker === null || worker === void 0 ? void 0 : worker.kill();
                     }
-                    clearInterval(timer);
                     res.status(200).json({
                         message: "mining stopped",
                         status: true,
@@ -179,26 +175,29 @@ const express_1 = __importDefault(require("express"));
                     });
                     for (let i = 0; i < core; i++) {
                         let worker = cluster_1.default.fork();
-                        timer = setInterval(() => {
-                            var _a;
-                            for (let j = 0; j < Object.keys(cluster_1.default === null || cluster_1.default === void 0 ? void 0 : cluster_1.default.workers).length; j++) {
-                                (_a = cluster_1.default.workers[j]) === null || _a === void 0 ? void 0 : _a.send({
-                                    chain: blockchain.chain,
-                                    transactions: [
-                                        Transaction_1.Transaction.reward(admin),
-                                        ...Object.values(transactionPool.transactionMap),
-                                    ],
-                                });
-                            }
-                        }, 1000);
-                        cluster_1.default.on("message", (worker, message, handle) => {
+                        worker === null || worker === void 0 ? void 0 : worker.send({
+                            chain: blockchain.chain,
+                            transactions: [
+                                Transaction_1.Transaction.reward(admin),
+                                ...Object.values(transactionPool.transactionMap),
+                            ],
+                        });
+                        worker.on("error", () => { });
+                        cluster_1.default.on("message", (worker, message, handle) => __awaiter(void 0, void 0, void 0, function* () {
                             if (message.chain) {
                                 if (blockchain.replaceChain(message.chain) === true) {
-                                    nodes.broadcast("chain", blockchain.chain);
+                                    yield nodes.broadcast("chain", blockchain.chain);
                                     transactionPool.clear();
+                                    worker === null || worker === void 0 ? void 0 : worker.send({
+                                        chain: blockchain.chain,
+                                        transactions: [
+                                            Transaction_1.Transaction.reward(admin),
+                                            ...Object.values(transactionPool.transactionMap),
+                                        ],
+                                    });
                                 }
                             }
-                        });
+                        }));
                     }
                 }
                 catch (err) {
@@ -209,7 +208,6 @@ const express_1 = __importDefault(require("express"));
                 }
             });
             app.post("/transaction", (req, res) => {
-                var _a, _b;
                 try {
                     if (!start) {
                         return res.status(400).json({
@@ -217,34 +215,36 @@ const express_1 = __importDefault(require("express"));
                             status: false,
                         });
                     }
-                    const { fromPublicKey, fromPrivateKey, toPublicKey, amount } = req.body;
+                    const { fromPublicKey, fromPrivateKey, toPublic, amount } = req.body;
                     const wallet = new Wallet_1.Wallet();
                     wallet.keyPair = (0, sign_1.recoveryKeyPair)(fromPrivateKey, fromPublicKey);
                     wallet.privateKey = fromPrivateKey;
                     wallet.publicKey = fromPublicKey;
                     let hasTransaction = transactionPool.isHave(wallet);
+                    console.log(hasTransaction == true);
                     if (hasTransaction) {
-                        hasTransaction.update(toPublicKey, amount, wallet);
+                        hasTransaction = hasTransaction.update(toPublic, amount, wallet);
+                        if (hasTransaction === null || hasTransaction === void 0 ? void 0 : hasTransaction.code) {
+                            return res.status(hasTransaction.code).json({
+                                message: hasTransaction.message,
+                                status: false,
+                            });
+                        }
                         return res.status(200).json({
                             message: "transaction updated",
                             status: true,
                             hasTransaction,
                         });
                     }
-                    let transaction = wallet.createTransaction(toPublicKey, amount, blockchain.chain);
-                    if (transaction.code) {
+                    let transaction = wallet.createTransaction(toPublic, Number(amount), blockchain.chain);
+                    if (transaction === null || transaction === void 0 ? void 0 : transaction.code) {
                         return res.status(transaction.code).json({
                             message: transaction.message,
                             status: false,
                         });
                     }
-                    (_b = (_a = cluster_1.default.workers) === null || _a === void 0 ? void 0 : _a.values) === null || _b === void 0 ? void 0 : _b.send({
-                        chain: blockchain.chain,
-                        transactions: [
-                            Transaction_1.Transaction.reward(admin),
-                            ...Object.values(transactionPool.transactionMap),
-                        ],
-                    });
+                    transactionPool.add(transaction);
+                    nodes.broadcast("transaction", transaction);
                     res.status(200).json({
                         message: "transaction created",
                         status: true,
@@ -252,6 +252,7 @@ const express_1 = __importDefault(require("express"));
                     });
                 }
                 catch (err) {
+                    console.dir(err, { depth: null });
                     res.status(500).json({
                         message: "transaction not created",
                         status: false,
@@ -287,6 +288,9 @@ const express_1 = __importDefault(require("express"));
                     });
                 }
             });
+            app.get("/pool", (req, res) => {
+                res.json(transactionPool.transactionMap);
+            });
             app.post("/chain/restart", (req, res) => {
                 try {
                     if (!start) {
@@ -319,6 +323,9 @@ const express_1 = __importDefault(require("express"));
     }
     else {
         process.on("message", (data) => {
+            // if(data === 'stop'){
+            //   return process.exit(0);
+            // }
             let blockchain = new Blockchain_1.Blockchain();
             blockchain.chain = data.chain;
             let transactions = data.transactions;

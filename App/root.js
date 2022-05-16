@@ -5,7 +5,7 @@ function default_1(blockChain, nodes, transactionPool, port) {
     const root = new Root_1.Root(port);
     root
         .start()
-        .then((value) => {
+        .then(() => {
         nodes.start();
         root.addMe();
     })
