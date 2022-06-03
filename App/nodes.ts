@@ -15,7 +15,7 @@ export default function (
 ) {
 
   nodes.bet("chain", (data: Array<_Block>) => {
-    console.log('recived chain : \n',data)
+    console.log('new chain : \n',data)
     if(blockchain.validTransactionData(data) === true && blockchain.replaceChain(data) === true) {
       transactionPool.clearBlockchainTransactions(data);
     };

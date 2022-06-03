@@ -4,6 +4,7 @@ import { _Nodes } from "../Src/interfaces/Network/_Nodes";
 import { _Root } from "../Src/interfaces/Network/_Root";
 import { _Block } from "../Src/interfaces/Blockchain/_Block";
 import { _TransactionPool } from "../Src/interfaces/Blockchain/_TransactionPool";
+import uniqid from "uniqid";
 export default function (
   blockChain: _Blockchain,
   nodes: _Nodes,
@@ -11,16 +12,9 @@ export default function (
   port: number
 ): void {
   const root: _Root = new Root(port);
-  root
-    .start()
-    .then(() => {
-      nodes.start();
-      root.addMe();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
+  root.start();
+  root.send("addMe",{hash : uniqid()});
+  nodes.start();
   root.bet("welcome", (data: any) => {
     nodes.list = data.nodeList;
     blockChain.chain = data.chain;
@@ -46,6 +40,6 @@ export default function (
   });
 
   root.bet("giveMeData", () => {
-    root.giveData(blockChain.chain, nodes.list);
+    root.send("giveMeData", { chain: blockChain.chain, node: nodes.list });
   });
 }

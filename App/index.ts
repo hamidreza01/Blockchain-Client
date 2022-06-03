@@ -49,6 +49,7 @@ import express from "express";
       let transactionPool: _TransactionPool;
       // let transactionMiner: _TransactionMiner;
       let start = false;
+      // let interval : any;
       // --- node api
       app.use((req, res, next) => {
         if (req.connection.localAddress === req.connection.remoteAddress) {
@@ -165,7 +166,8 @@ import express from "express";
             });
           }
           for (const worker of Object.values(cluster.workers!)) {
-            worker?.kill();
+            // worker?.send("end");
+            worker?.kill()
           }
           res.status(200).json({
             message: "mining stopped",
@@ -203,21 +205,22 @@ import express from "express";
             });
             worker.on("error", () => {});
             cluster.on("message", async (worker, message, handle) => {
+              worker?.send({
+                chain: blockchain.chain,
+                transactions: [
+                  Transaction.reward(admin),
+                  ...Object.values(transactionPool.transactionMap),
+                ],
+              });
               if (message.chain) {
                 if (blockchain.replaceChain(message.chain) === true) {
                   await nodes.broadcast("chain", blockchain.chain);
                   transactionPool.clear();
-                  worker?.send({
-                    chain: blockchain.chain,
-                    transactions: [
-                      Transaction.reward(admin),
-                      ...Object.values(transactionPool.transactionMap),
-                    ],
-                  });
                 }
               }
             });
           }
+          //interval = setInterval(()=>{})
         } catch (err) {
           res.status(500).json({
             message: "error mining",
@@ -316,6 +319,7 @@ import express from "express";
           });
         }
       });
+
       app.get("/pool", (req, res) => {
         res.json(transactionPool.transactionMap);
       });
@@ -350,7 +354,7 @@ import express from "express";
     }
   } else {
     process.on("message", (data: any) => {
-      // if(data === 'stop'){
+      // if (data === "end") {
       //   return process.exit(0);
       // }
       let blockchain = new Blockchain();

@@ -37,6 +37,7 @@ const express_1 = __importDefault(require("express"));
             let transactionPool;
             // let transactionMiner: _TransactionMiner;
             let start = false;
+            // let interval : any;
             // --- node api
             app.use((req, res, next) => {
                 if (req.connection.localAddress === req.connection.remoteAddress) {
@@ -146,6 +147,7 @@ const express_1 = __importDefault(require("express"));
                         });
                     }
                     for (const worker of Object.values(cluster_1.default.workers)) {
+                        // worker?.send("end");
                         worker === null || worker === void 0 ? void 0 : worker.kill();
                     }
                     res.status(200).json({
@@ -184,21 +186,22 @@ const express_1 = __importDefault(require("express"));
                         });
                         worker.on("error", () => { });
                         cluster_1.default.on("message", (worker, message, handle) => __awaiter(void 0, void 0, void 0, function* () {
+                            worker === null || worker === void 0 ? void 0 : worker.send({
+                                chain: blockchain.chain,
+                                transactions: [
+                                    Transaction_1.Transaction.reward(admin),
+                                    ...Object.values(transactionPool.transactionMap),
+                                ],
+                            });
                             if (message.chain) {
                                 if (blockchain.replaceChain(message.chain) === true) {
                                     yield nodes.broadcast("chain", blockchain.chain);
                                     transactionPool.clear();
-                                    worker === null || worker === void 0 ? void 0 : worker.send({
-                                        chain: blockchain.chain,
-                                        transactions: [
-                                            Transaction_1.Transaction.reward(admin),
-                                            ...Object.values(transactionPool.transactionMap),
-                                        ],
-                                    });
                                 }
                             }
                         }));
                     }
+                    //interval = setInterval(()=>{})
                 }
                 catch (err) {
                     res.status(500).json({
@@ -323,7 +326,7 @@ const express_1 = __importDefault(require("express"));
     }
     else {
         process.on("message", (data) => {
-            // if(data === 'stop'){
+            // if (data === "end") {
             //   return process.exit(0);
             // }
             let blockchain = new Blockchain_1.Blockchain();

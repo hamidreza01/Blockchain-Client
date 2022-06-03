@@ -2,15 +2,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.config = void 0;
 const DEFUALT_DIFFICULTY = 10;
+const ADMIN = {
+    httpIP: `localhost:45451`,
+};
 const REWARD_TRANSACTION = {
-    address: '**DPX Blockchain**',
+    address: "**DPX Blockchain**",
 };
 const REWARD = 10;
 exports.config = {
-    NODE_PORT: 1200,
+    NODE_PORT: 1414,
+    ADMIN,
     MINE_RATE: 1000 * 60 * 10,
-    ROOT_URL: "127.0.0.1",
-    ROOT_PORT: 3001,
+    ROOT_URL: "10.8.0.2",
     GENESIS_DATA: {
         hash: "DEFAULT-DPX-GENESIS-HASH",
         lastHash: "DEFAULT-DPX-LAST-HASH",

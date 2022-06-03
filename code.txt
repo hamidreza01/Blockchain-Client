@@ -14,8 +14,7 @@
 -- 200-299 - connection
 
 --- 200 - success 
---- 250 - error connecting to the root server
---- 251 - connect to the root server of timeout
+--- 250 - port is already in use
 
 -- 500-599 - server 
 
