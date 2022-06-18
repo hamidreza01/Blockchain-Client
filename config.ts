@@ -12,7 +12,7 @@ export const config = {
   NODE_PORT: 1414,
   ADMIN,
   MINE_RATE: 1000 * 60 * 10,
-  ROOT_URL: "10.8.0.2",
+  ROOT_URL: "127.0.0.1:1000",
   GENESIS_DATA: {
     hash: "DEFAULT-DPX-GENESIS-HASH",
     lastHash: "DEFAULT-DPX-LAST-HASH",
