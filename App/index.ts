@@ -1,41 +1,22 @@
 import { Blockchain } from "../Src/classes/Blockchain/Blockchain";
-
 import { _Blockchain } from "../Src/interfaces/Blockchain/_Blockchain";
-
 import { _Block } from "../Src/interfaces/Blockchain/_Block";
-
 import { Nodes } from "../Src/classes/Network/Nodes";
-
 import { _Nodes } from "../Src/interfaces/Network/_Nodes";
-
 import { Wallet } from "../Src/classes/Blockchain/Wallet";
-
 import { _Wallet } from "../Src/interfaces/Blockchain/_Wallet";
-
 import { TransactionPool } from "../Src/classes/Blockchain/TransactionPool";
-
 import { _TransactionPool } from "../Src/interfaces/Blockchain/_TransactionPool";
-
 import { _Transaction } from "../Src/interfaces/Blockchain/_Transaction";
-
 import cluster from "cluster";
-
 import rootFunction from "./root";
-
 import nodesFunction from "./nodes";
-
 import { config } from "../config";
-
 import { recoveryKeyPair } from "../Src/Addon/sign";
-
 import { _Errors } from "../Src/types/errors_interface";
-
 import { Transaction } from "../Src/classes/Blockchain/Transaction";
-
 import fs from "fs";
-
 import express from "express";
-
 (async () => {
   // console.log = () => {};
   if (cluster.isPrimary) {
@@ -58,9 +39,7 @@ import express from "express";
           res.status(403).send("forbidden");
         }
       });
-
       app.use(express.json());
-
       app.post("/start", (req, res) => {
         try {
           blockchain = new Blockchain();
@@ -105,7 +84,6 @@ import express from "express";
           }
         }
       });
-
       app.post("/wallet/create", (req, res) => {
         try {
           if (!start) {
@@ -130,7 +108,6 @@ import express from "express";
           });
         }
       });
-
       app.post("/wallet/balance/:publicKey", (req, res) => {
         try {
           if (!start) {
@@ -156,7 +133,6 @@ import express from "express";
           });
         }
       });
-
       app.post("/mine/stop", (req, res) => {
         try {
           if (!start) {
@@ -167,7 +143,7 @@ import express from "express";
           }
           for (const worker of Object.values(cluster.workers!)) {
             // worker?.send("end");
-            worker?.kill()
+            worker?.kill();
           }
           res.status(200).json({
             message: "mining stopped",
@@ -180,7 +156,6 @@ import express from "express";
           });
         }
       });
-
       app.post("/mine/start/:core", (req, res) => {
         try {
           if (!start) {
@@ -200,7 +175,9 @@ import express from "express";
               chain: blockchain.chain,
               transactions: [
                 Transaction.reward(admin),
-                ...Object.values(transactionPool.transactionMap),
+                ...Object.values(transactionPool.transactionMap).filter((v) => {
+                  Transaction.isValid(v as any) === true;
+                }),
               ],
             });
             worker.on("error", () => {});
@@ -228,7 +205,6 @@ import express from "express";
           });
         }
       });
-
       app.post("/transaction", (req, res) => {
         try {
           if (!start) {

@@ -181,7 +181,9 @@ const express_1 = __importDefault(require("express"));
                             chain: blockchain.chain,
                             transactions: [
                                 Transaction_1.Transaction.reward(admin),
-                                ...Object.values(transactionPool.transactionMap),
+                                ...Object.values(transactionPool.transactionMap).filter((v) => {
+                                    Transaction_1.Transaction.isValid(v) === true;
+                                }),
                             ],
                         });
                         worker.on("error", () => { });
