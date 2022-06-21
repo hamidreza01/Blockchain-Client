@@ -23,10 +23,10 @@ export class Blockchain implements _Blockchain {
         chain[i].hash !==
         hashCreator(
           chain[i].lastHash,
-          JSON.stringify(chain[i].data),
           chain[i].nonce.toString(),
+          chain[i].timestamp.toString(),
           chain[i].difficulty.toString(),
-          chain[i].timestamp.toString()
+          JSON.stringify(chain[i].data)
         )
       ) {
         return false;

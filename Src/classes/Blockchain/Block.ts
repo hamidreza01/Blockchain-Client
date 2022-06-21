@@ -30,8 +30,8 @@ export class Block implements _Block {
         lastHash,
         nonce.toString(),
         timestamp.toString(),
-        JSON.stringify(data),
-        difficulty.toString()
+        difficulty.toString(),
+        JSON.stringify(data)
       );
     } while (hexToBin(hash).slice(0, difficulty) !== "0".repeat(difficulty));
     {

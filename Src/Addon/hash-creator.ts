@@ -1,7 +1,7 @@
 import * as crypto from "crypto";
 export const hashCreator = (...data : string[]) => {
   const hash = crypto.createHash("sha256");
-  return hash.update(data.sort((a, b) => a.localeCompare(b)).join("")).digest("hex");
+  return hash.update(data.join("")).digest("hex");
 };
 // import * as crypto from "crypto";
 // export const hashCreator = (...data: Array<string>): string => {

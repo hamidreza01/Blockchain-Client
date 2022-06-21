@@ -28,7 +28,7 @@ class Block {
             nonce++;
             timestamp = Date.now();
             difficulty = Block.adJustDifficulty(lastBlock, timestamp);
-            hash = (0, hash_creator_1.hashCreator)(lastHash, nonce.toString(), timestamp.toString(), JSON.stringify(data), difficulty.toString());
+            hash = (0, hash_creator_1.hashCreator)(lastHash, nonce.toString(), timestamp.toString(), difficulty.toString(), JSON.stringify(data));
         } while ((0, hex_to_bin_1.default)(hash).slice(0, difficulty) !== "0".repeat(difficulty));
         {
             return new Block(timestamp, data, hash, lastHash, nonce, difficulty);

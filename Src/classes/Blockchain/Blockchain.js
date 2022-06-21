@@ -19,7 +19,7 @@ class Blockchain {
             return false;
         for (let i = 1; i < chain.length; i++) {
             if (chain[i].hash !==
-                (0, hash_creator_1.hashCreator)(chain[i].lastHash, JSON.stringify(chain[i].data), chain[i].nonce.toString(), chain[i].difficulty.toString(), chain[i].timestamp.toString())) {
+                (0, hash_creator_1.hashCreator)(chain[i].lastHash, chain[i].nonce.toString(), chain[i].timestamp.toString(), chain[i].difficulty.toString(), JSON.stringify(chain[i].data))) {
                 return false;
             }
             if (chain[i].lastHash !== chain[i - 1].hash) {

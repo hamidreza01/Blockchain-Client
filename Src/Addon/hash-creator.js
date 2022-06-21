@@ -27,7 +27,7 @@ exports.hashCreator = void 0;
 const crypto = __importStar(require("crypto"));
 const hashCreator = (...data) => {
     const hash = crypto.createHash("sha256");
-    return hash.update(data.sort((a, b) => a.localeCompare(b)).join("")).digest("hex");
+    return hash.update(data.join("")).digest("hex");
 };
 exports.hashCreator = hashCreator;
 // import * as crypto from "crypto";
