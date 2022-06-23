@@ -16,9 +16,10 @@ export default function (
   root.send("addMe", { data: {hash : root.hash, port} });
   nodes.start();
   root.bet("welcome", (data: any) => {
-    nodes.list = data.nodes;
-    // blockChain.chain = data.chain;
-    // transactionPool.transactionMap = data.transactionMap;
+    console.log(data)
+    nodes.list = data.nodes || nodes.list;
+    blockChain.chain = data.chain || blockChain.chain;
+    transactionPool.transactionMap = data.transaction || transactionPool.transactionMap;
   });
 
   root.bet("sliceChain", (data: number) => {
@@ -39,9 +40,9 @@ export default function (
     nodes.list.push(data);
   });
 
-  root.bet("giveMeData", () => {
-    root.send("giveMeData", {
-      data: { chain: blockChain.chain, node: nodes.list },
-    });
-  });
+  // root.bet("giveMeData", () => {
+  //   root.send("giveMeData", {
+  //     data: { chain: blockChain.chain, node: nodes.list },
+  //   });
+  // });
 }

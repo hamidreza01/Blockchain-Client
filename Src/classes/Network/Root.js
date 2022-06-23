@@ -28,7 +28,7 @@ class Root {
             }
             next();
         });
-        this.app.listen(this.port);
+        this.app.listen(this.port /*,"0.0.0.0"*/);
     }
     bet(channel, callback) {
         this.app.post("/" + channel, (req, res) => {

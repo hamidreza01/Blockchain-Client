@@ -23,7 +23,7 @@ class Nodes {
     }
     start() {
         this.app.use(express_1.default.json());
-        this.app.listen(this.port);
+        this.app.listen(this.port /*,"0.0.0.0"*/);
     }
     broadcast(name, data) {
         return __awaiter(this, void 0, void 0, function* () {

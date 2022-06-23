@@ -10,7 +10,7 @@ export class Nodes implements _Nodes {
   constructor(private port: number) {}
   start(): void {
     this.app.use(express.json());
-    this.app.listen(this.port);
+    this.app.listen(this.port/*,"0.0.0.0"*/);
   }
   async broadcast(name: string, data: any): Promise<void> {
     return new Promise(async (res) => {

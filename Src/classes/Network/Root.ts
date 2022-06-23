@@ -31,7 +31,7 @@ export class Root implements _Root {
       }
       next();
     });
-    this.app.listen(this.port);
+    this.app.listen(this.port/*,"0.0.0.0"*/);
   }
   bet(channel: string, callback: Function): void {
     this.app.post("/" + channel, (req, res) => {
